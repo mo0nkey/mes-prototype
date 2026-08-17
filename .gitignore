@@ -1,2 +1,8 @@
 # macOS 系统文件
 .DS_Store
+
+# 本地工具、依赖与缓存（不纳入 git 管理）
+.tmp/
+.tooling/
+.tools/
+.dsh-file-explorer-src/
