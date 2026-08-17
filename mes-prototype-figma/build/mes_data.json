@@ -1,0 +1,1451 @@
+{
+ "pages": [
+  {
+   "id": "login",
+   "name": "登录",
+   "blocks": [
+    {
+     "type": "h1",
+     "text": "MES 制造执行系统"
+    },
+    {
+     "type": "sub",
+     "text": "演示原型 v0.1 · 汽车零部件模具制造"
+    },
+    {
+     "type": "text",
+     "text": "用户名[输入:如 admin / planner] 密　码[输入:••••••] "
+    },
+    {
+     "type": "muted",
+     "text": "演示账号：admin（管理员）/ planner（计划科）/ director（车间主任）/ proj01（项目科）/ design01（设计科）/ prog01（编程科）/ wh01（仓库科）/ op01-op05（操作工）/ quality（质量科）"
+    },
+    {
+     "type": "muted",
+     "text": "交互：登录后按角色跳转对应首页；密码错误提示"
+    }
+   ]
+  },
+  {
+   "id": "shopfloor",
+   "name": "工位执行端",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "工位：CNC 1# ｜ 操作工：张三"
+     ],
+     "rights": [
+      {
+       "cls": "btn sm",
+       "text": "退出"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": null,
+     "children": [
+      {
+       "type": "text",
+       "text": "当前任务：MOLD-1001 前门内板拉延模",
+       "role": "h1"
+      },
+      {
+       "type": "text",
+       "text": "工序 2/6 CNC 粗加工 ｜ 加工组：大件组（3 件）｜ 编程号：P-1001-2 ｜ 铁板规格：12mm×2000×1000",
+       "role": "sub"
+      },
+      {
+       "type": "steps",
+       "items": [
+        {
+         "num": "1",
+         "title": "扫码开工",
+         "extra": "[输入:SN 或回车]"
+        },
+        {
+         "num": "2",
+         "title": "绑定铁板批次",
+         "extra": "[输入:批次标签或回车]"
+        },
+        {
+         "num": "3",
+         "title": "报工 + 提交确认",
+         "extra": "数量 [输入:]工时 [输入:]"
+        }
+       ]
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "buttons",
+       "items": [
+        {
+         "cls": "btn primary",
+         "text": "④ 提交确认 → 待审核"
+        }
+       ]
+      },
+      {
+       "type": "text",
+       "text": "提示：扫码枪 = 键盘回车，3 步闭环"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "安灯上报"
+     },
+     "children": [
+      {
+       "type": "buttons",
+       "items": [
+        {
+         "cls": "btn",
+         "text": "缺料"
+        },
+        {
+         "cls": "btn",
+         "text": "设备"
+        },
+        {
+         "cls": "btn",
+         "text": "质量"
+        },
+        {
+         "cls": "btn",
+         "text": "其他"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "muted",
+     "text": "权限：仅本工位任务；数据范围=自己；提交后状态置为「待审核」"
+    }
+   ]
+  },
+  {
+   "id": "scheduling",
+   "name": "排产工作台",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "排产工作台（计划科）"
+     ],
+     "rights": [
+      {
+       "cls": "btn sm primary",
+       "text": "模拟模式"
+      },
+      {
+       "cls": "btn sm",
+       "text": "正式模式"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "待排工单队列"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "工单号"
+        },
+        {
+         "text": "产品"
+        },
+        {
+         "text": "承诺交期"
+        },
+        {
+         "text": "风险"
+        },
+        {
+         "text": "操作"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "前门内板拉延模"
+         },
+         {
+          "text": "3/31"
+         },
+         {
+          "text": "⚠️ 逾期2天",
+          "tag": "red"
+         },
+         {
+          "text": "倒排建议",
+          "btn": "primary"
+         }
+        ],
+        [
+         {
+          "text": "WO-002"
+         },
+         {
+          "text": "A柱加强板翻边模"
+         },
+         {
+          "text": "4/05"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         },
+         {
+          "text": "倒排建议",
+          "btn": ""
+         }
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "建议排期（交期倒排结果 · WO-001）"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "工序"
+        },
+        {
+         "text": "最晚开始"
+        },
+        {
+         "text": "最晚结束"
+        },
+        {
+         "text": "工位"
+        },
+        {
+         "text": "状态"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "设计"
+         },
+         {
+          "text": "3/17"
+         },
+         {
+          "text": "3/18"
+         },
+         {
+          "text": "D1"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "CNC 加工组"
+         },
+         {
+          "text": "3/19"
+         },
+         {
+          "text": "3/21"
+         },
+         {
+          "text": "CNC 1#"
+         },
+         {
+          "text": "⚠️ 与 WO-003 冲突",
+          "tag": "orange"
+         }
+        ],
+        [
+         {
+          "text": "热处理"
+         },
+         {
+          "text": "3/22"
+         },
+         {
+          "text": "3/23"
+         },
+         {
+          "text": "H1"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "EDM 精加工"
+         },
+         {
+          "text": "3/24"
+         },
+         {
+          "text": "3/26"
+         },
+         {
+          "text": "EDM 3#"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "钳工装配"
+         },
+         {
+          "text": "3/27"
+         },
+         {
+          "text": "3/28"
+         },
+         {
+          "text": "装配 2#"
+         },
+         {
+          "text": "待齐套(缺2项)",
+          "tag": "gray"
+         }
+        ],
+        [
+         {
+          "text": "试模"
+         },
+         {
+          "text": "3/29"
+         },
+         {
+          "text": "3/31"
+         },
+         {
+          "text": "试模台 1#"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ]
+       ]
+      },
+      {
+       "type": "text",
+       "text": "（每次调整后重算冲突与交期，只提示不强制）"
+      },
+      {
+       "type": "buttons",
+       "items": [
+        {
+         "cls": "btn",
+         "text": "改开始时间"
+        },
+        {
+         "cls": "btn",
+         "text": "换工位"
+        },
+        {
+         "cls": "btn primary",
+         "text": "即时重算"
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "review",
+   "name": "审核工作台",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "审核工作台（车间主任）",
+      "待审核：3 项"
+     ],
+     "rights": []
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "待审核列表"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "工单"
+        },
+        {
+         "text": "工序/环节"
+        },
+        {
+         "text": "提交人"
+        },
+        {
+         "text": "提交时间"
+        },
+        {
+         "text": "操作"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "CNC 加工组"
+         },
+         {
+          "text": "张三"
+         },
+         {
+          "text": "10:32"
+         },
+         {
+          "text": "驳回",
+          "btn": "danger"
+         }
+        ],
+        [
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "钳工装配"
+         },
+         {
+          "text": "李四"
+         },
+         {
+          "text": "09:15"
+         },
+         {
+          "text": "驳回",
+          "btn": "danger"
+         }
+        ],
+        [
+         {
+          "text": "WO-002"
+         },
+         {
+          "text": "设计审核"
+         },
+         {
+          "text": "王工"
+         },
+         {
+          "text": "08:40"
+         },
+         {
+          "text": "驳回",
+          "btn": "danger"
+         }
+        ]
+       ]
+      },
+      {
+       "type": "text",
+       "text": "驳回弹窗：原因（必填）[输入:如 尺寸超差，需返工] "
+      },
+      {
+       "type": "buttons",
+       "items": [
+        {
+         "cls": "btn danger",
+         "text": "确认驳回 → 退回提交人"
+        },
+        {
+         "cls": "btn",
+         "text": "取消"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "已审核记录（可查）"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "工单"
+        },
+        {
+         "text": "环节"
+        },
+        {
+         "text": "审核人"
+        },
+        {
+         "text": "结果"
+        },
+        {
+         "text": "时间"
+        },
+        {
+         "text": "原因"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "WO-002"
+         },
+         {
+          "text": "设计"
+         },
+         {
+          "text": "设计科长"
+         },
+         {
+          "text": "通过",
+          "tag": "green"
+         },
+         {
+          "text": "3/18"
+         },
+         {
+          "text": "—"
+         }
+        ],
+        [
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "编程"
+         },
+         {
+          "text": "编程科长"
+         },
+         {
+          "text": "驳回",
+          "tag": "red"
+         },
+         {
+          "text": "3/19"
+         },
+         {
+          "text": "程序路径需修正"
+         }
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "type": "muted",
+     "text": "权限：车间主任审厂房全部工序；各科科长审本科室；驳回不限次数、退回上一环节成员附原因"
+    }
+   ]
+  },
+  {
+   "id": "board",
+   "name": "生产看板",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "生产进度看板（自动刷新 10s）"
+     ],
+     "rights": [
+      {
+       "cls": "btn sm",
+       "text": "全屏"
+      }
+     ]
+    },
+    {
+     "type": "board",
+     "cards": [
+      {
+       "title": "在产工单",
+       "big": "",
+       "muted": "6完成 2 · 逾期风险 1"
+      },
+      {
+       "title": "今日报工",
+       "big": "",
+       "muted": "128待审核 5"
+      },
+      {
+       "title": "齐套检查",
+       "big": "",
+       "muted": "2/6缺料工单 1"
+      },
+      {
+       "title": "安灯",
+       "big": "",
+       "muted": "2缺料 1 · 质量 1"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "产线进度"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "产线"
+        },
+        {
+         "text": "工单"
+        },
+        {
+         "text": "当前工序"
+        },
+        {
+         "text": "进度"
+        },
+        {
+         "text": "达成率"
+        },
+        {
+         "text": "风险"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "CNC"
+         },
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "3/6 热处理"
+         },
+         {
+          "text": ""
+         },
+         {
+          "text": "75%"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "CNC"
+         },
+         {
+          "text": "WO-002"
+         },
+         {
+          "text": "1/6 设计"
+         },
+         {
+          "text": ""
+         },
+         {
+          "text": "20%"
+         },
+         {
+          "text": "临期",
+          "tag": "orange"
+         }
+        ],
+        [
+         {
+          "text": "装配"
+         },
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "齐套检查"
+         },
+         {
+          "text": ""
+         },
+         {
+          "text": "—"
+         },
+         {
+          "text": "待齐套(缺2项)",
+          "tag": "gray"
+         }
+        ]
+       ]
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "text",
+       "text": ""
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "安灯实时"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "工位"
+        },
+        {
+         "text": "类型"
+        },
+        {
+         "text": "持续"
+        },
+        {
+         "text": "状态"
+        },
+        {
+         "text": "处理"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "CNC 2#"
+         },
+         {
+          "text": "🔴 缺料",
+          "tag": "red"
+         },
+         {
+          "text": "14 min"
+         },
+         {
+          "text": "待处理"
+         },
+         {
+          "text": "处理",
+          "btn": ""
+         }
+        ],
+        [
+         {
+          "text": "装配 1#"
+         },
+         {
+          "text": "🟡 质量",
+          "tag": "orange"
+         },
+         {
+          "text": "5 min"
+         },
+         {
+          "text": "待处理"
+         },
+         {
+          "text": "处理",
+          "btn": ""
+         }
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "type": "muted",
+     "text": "权限：全员可见；操作工限本组；质量科只读；交期风险逾期红色高亮"
+    }
+   ]
+  },
+  {
+   "id": "trace",
+   "name": "追溯中心",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "追溯中心"
+     ],
+     "rights": [
+      {
+       "cls": "btn sm primary",
+       "text": "正向：SN"
+      },
+      {
+       "cls": "btn sm",
+       "text": "反向：批次"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "正向追溯 · SN：MOLD-2025-0001"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "环节"
+        },
+        {
+         "text": "时间"
+        },
+        {
+         "text": "执行人"
+        },
+        {
+         "text": "工位"
+        },
+        {
+         "text": "结果"
+        },
+        {
+         "text": "审核"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "设计"
+         },
+         {
+          "text": "3/17"
+         },
+         {
+          "text": "王工"
+         },
+         {
+          "text": "D1"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "科长通过",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "CNC 加工组"
+         },
+         {
+          "text": "3/19-21"
+         },
+         {
+          "text": "张三"
+         },
+         {
+          "text": "CNC 1#"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "主任通过",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "热处理"
+         },
+         {
+          "text": "3/22-23"
+         },
+         {
+          "text": "（外协/炉）"
+         },
+         {
+          "text": "H1"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "主任通过",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "钳工装配"
+         },
+         {
+          "text": "3/27-28"
+         },
+         {
+          "text": "李四"
+         },
+         {
+          "text": "装配 2#"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "主任通过",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "试模"
+         },
+         {
+          "text": "3/29-31"
+         },
+         {
+          "text": "赵工"
+         },
+         {
+          "text": "试模台 1#"
+         },
+         {
+          "text": "样板 ×1"
+         },
+         {
+          "text": "主任通过",
+          "tag": "green"
+         }
+        ]
+       ]
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "用料追溯"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "类别"
+        },
+        {
+         "text": "物料"
+        },
+        {
+         "text": "批次/来源"
+        },
+        {
+         "text": "数量"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "自制件铁板"
+         },
+         {
+          "text": "模架板 12mm"
+         },
+         {
+          "text": "批次 B-001（供应商/炉号）"
+         },
+         {
+          "text": "1 张"
+         }
+        ],
+        [
+         {
+          "text": "外购件"
+         },
+         {
+          "text": "导柱 φ40"
+         },
+         {
+          "text": "库存（项目申购到货）"
+         },
+         {
+          "text": "4 件"
+         }
+        ],
+        [
+         {
+          "text": "外购件"
+         },
+         {
+          "text": "导套 φ60"
+         },
+         {
+          "text": "库存"
+         },
+         {
+          "text": "4 件"
+         }
+        ]
+       ]
+      },
+      {
+       "type": "text",
+       "text": ""
+      },
+      {
+       "type": "buttons",
+       "items": [
+        {
+         "cls": "btn",
+         "text": "导出 CSV"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "type": "muted",
+     "text": "反向追溯：输入铁板批次号 → 列出受影响模具清单（质量问题快速定位）"
+    }
+   ]
+  },
+  {
+   "id": "wo",
+   "name": "工单列表",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "工单管理（计划科）"
+     ],
+     "rights": [
+      {
+       "cls": "btn sm primary",
+       "text": "+ 新建工单"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": null,
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "工单号"
+        },
+        {
+         "text": "项目"
+        },
+        {
+         "text": "产品"
+        },
+        {
+         "text": "交期"
+        },
+        {
+         "text": "当前环节"
+        },
+        {
+         "text": "状态"
+        },
+        {
+         "text": "风险"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "WO-001"
+         },
+         {
+          "text": "P-2025-01"
+         },
+         {
+          "text": "前门内板拉延模"
+         },
+         {
+          "text": "3/31"
+         },
+         {
+          "text": "钳工装配（待齐套）"
+         },
+         {
+          "text": "生产中"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "WO-002"
+         },
+         {
+          "text": "P-2025-02"
+         },
+         {
+          "text": "A柱加强板翻边模"
+         },
+         {
+          "text": "4/05"
+         },
+         {
+          "text": "设计（审核中）"
+         },
+         {
+          "text": "生产中"
+         },
+         {
+          "text": "临期",
+          "tag": "orange"
+         }
+        ],
+        [
+         {
+          "text": "WO-003"
+         },
+         {
+          "text": "P-2025-03"
+         },
+         {
+          "text": "翼子板冲孔模"
+         },
+         {
+          "text": "4/10"
+         },
+         {
+          "text": "模拟排期"
+         },
+         {
+          "text": "已排产"
+         },
+         {
+          "text": "正常",
+          "tag": "green"
+         }
+        ]
+       ]
+      },
+      {
+       "type": "text",
+       "text": "筛选：状态 / 产品 / 交期 / 产线 ｜ 交期风险列表（逾期/临期高亮）",
+       "role": "muted"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "工单详情（WO-001）· 工序时间线"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "序号"
+        },
+        {
+         "text": "工序"
+        },
+        {
+         "text": "计划"
+        },
+        {
+         "text": "实际"
+        },
+        {
+         "text": "状态"
+        },
+        {
+         "text": "审核"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "1"
+         },
+         {
+          "text": "设计"
+         },
+         {
+          "text": "3/17-18"
+         },
+         {
+          "text": "3/17-18"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "科长✅"
+         }
+        ],
+        [
+         {
+          "text": "2"
+         },
+         {
+          "text": "CNC 加工组"
+         },
+         {
+          "text": "3/19-21"
+         },
+         {
+          "text": "3/19-21"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "主任✅"
+         }
+        ],
+        [
+         {
+          "text": "3"
+         },
+         {
+          "text": "热处理"
+         },
+         {
+          "text": "3/22-23"
+         },
+         {
+          "text": "3/22-23"
+         },
+         {
+          "text": "完成"
+         },
+         {
+          "text": "主任✅"
+         }
+        ],
+        [
+         {
+          "text": "4"
+         },
+         {
+          "text": "EDM 精加工"
+         },
+         {
+          "text": "3/24-26"
+         },
+         {
+          "text": "—"
+         },
+         {
+          "text": "待执行"
+         },
+         {
+          "text": "—"
+         }
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "project",
+   "name": "项目台账",
+   "blocks": [
+    {
+     "type": "topbar",
+     "parts": [
+      "项目台账（项目科）"
+     ],
+     "rights": [
+      {
+       "cls": "btn sm primary",
+       "text": "+ 新建项目"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": null,
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "项目编号"
+        },
+        {
+         "text": "名称"
+        },
+        {
+         "text": "客户"
+        },
+        {
+         "text": "图纸引用"
+        },
+        {
+         "text": "状态"
+        },
+        {
+         "text": "进度"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "P-2025-01"
+         },
+         {
+          "text": "某车型门板模具开发"
+         },
+         {
+          "text": "车架事业部"
+         },
+         {
+          "text": "DW-2201"
+         },
+         {
+          "text": "开发中"
+         },
+         {
+          "text": "3/6 工序"
+         }
+        ],
+        [
+         {
+          "text": "P-2025-02"
+         },
+         {
+          "text": "某车型侧围模具开发"
+         },
+         {
+          "text": "车架事业部"
+         },
+         {
+          "text": "DW-2203"
+         },
+         {
+          "text": "模拟排期"
+         },
+         {
+          "text": "1/6"
+         }
+        ]
+       ]
+      },
+      {
+       "type": "text",
+       "text": "启动会记录（线下）：kickoff_note ｜ 排期模拟 → 线上演示 → 确认发布",
+       "role": "muted"
+      }
+     ]
+    },
+    {
+     "type": "panel",
+     "title": {
+      "type": "text",
+      "text": "外购件申购（项目科发起 → 仓库科到货）"
+     },
+     "children": [
+      {
+       "headers": [
+        {
+         "text": "申购单"
+        },
+        {
+         "text": "外购件"
+        },
+        {
+         "text": "数量"
+        },
+        {
+         "text": "需求日期"
+        },
+        {
+         "text": "状态"
+        }
+       ],
+       "rows": [
+        [
+         {
+          "text": "PR-001"
+         },
+         {
+          "text": "导柱 φ40"
+         },
+         {
+          "text": "4"
+         },
+         {
+          "text": "3/25"
+         },
+         {
+          "text": "已到货",
+          "tag": "green"
+         }
+        ],
+        [
+         {
+          "text": "PR-002"
+         },
+         {
+          "text": "标准件组套"
+         },
+         {
+          "text": "1"
+         },
+         {
+          "text": "3/28"
+         },
+         {
+          "text": "申请中",
+          "tag": "orange"
+         }
+        ]
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
