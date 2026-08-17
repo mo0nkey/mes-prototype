@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "工位报工与审核流转时序",
+    "output": "报工流转时序.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      940,
+      800
+    ],
+    "views": [
+      {
+        "id": "start",
+        "label": "扫码开工",
+        "focus": [
+          "operator",
+          "station",
+          "api",
+          "db"
+        ],
+        "note": "扫码校验后记录开工时间。"
+      },
+      {
+        "id": "report",
+        "label": "报工并提交审核",
+        "focus": [
+          "station",
+          "api",
+          "db"
+        ],
+        "note": "报工后进入待审核状态。"
+      },
+      {
+        "id": "review",
+        "label": "审核流转",
+        "focus": [
+          "reviewer",
+          "api",
+          "db"
+        ],
+        "note": "审核通过才流转下一工序。"
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "operator",
+      "type": "external",
+      "label": "操作工",
+      "sublabel": "CNC/钳工/装配"
+    },
+    {
+      "id": "station",
+      "type": "frontend",
+      "label": "工位端",
+      "sublabel": "浏览器"
+    },
+    {
+      "id": "api",
+      "type": "backend",
+      "label": "执行服务",
+      "sublabel": "FastAPI"
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "SQLite",
+      "sublabel": "WAL 模式"
+    },
+    {
+      "id": "reviewer",
+      "type": "external",
+      "label": "审核人",
+      "sublabel": "车间主任/科长"
+    }
+  ],
+  "segments": [
+    {
+      "from": 160,
+      "to": 315,
+      "label": "开工"
+    },
+    {
+      "from": 330,
+      "to": 460,
+      "label": "原料绑定"
+    },
+    {
+      "from": 475,
+      "to": 610,
+      "label": "报工 + 提交审核"
+    },
+    {
+      "from": 630,
+      "to": 730,
+      "label": "审核流转"
+    }
+  ],
+  "messages": [
+    {
+      "id": "scan-sn",
+      "from": "operator",
+      "to": "station",
+      "y": 185,
+      "label": "扫码 SN（回车）",
+      "variant": "default"
+    },
+    {
+      "id": "start-request",
+      "from": "station",
+      "to": "api",
+      "y": 225,
+      "label": "POST /start 开工",
+      "variant": "emphasis"
+    },
+    {
+      "id": "start-tx",
+      "from": "api",
+      "to": "db",
+      "y": 265,
+      "label": "校验并记录开工",
+      "variant": "emphasis"
+    },
+    {
+      "id": "start-ok",
+      "from": "api",
+      "to": "station",
+      "y": 300,
+      "label": "开工成功",
+      "variant": "return"
+    },
+    {
+      "id": "scan-batch",
+      "from": "operator",
+      "to": "station",
+      "y": 340,
+      "label": "扫原料批次标签",
+      "variant": "default"
+    },
+    {
+      "id": "bind-request",
+      "from": "station",
+      "to": "api",
+      "y": 372,
+      "label": "POST /bind-material",
+      "variant": "default"
+    },
+    {
+      "id": "bind-tx",
+      "from": "api",
+      "to": "db",
+      "y": 412,
+      "label": "写入批次绑定",
+      "variant": "emphasis"
+    },
+    {
+      "id": "bind-ok",
+      "from": "api",
+      "to": "station",
+      "y": 447,
+      "label": "绑定成功",
+      "variant": "return"
+    },
+    {
+      "id": "report-submit",
+      "from": "operator",
+      "to": "station",
+      "y": 490,
+      "label": "报工 N 件并提交确认",
+      "variant": "default"
+    },
+    {
+      "id": "report-request",
+      "from": "station",
+      "to": "api",
+      "y": 525,
+      "label": "POST /report（批量）",
+      "variant": "emphasis"
+    },
+    {
+      "id": "report-tx",
+      "from": "api",
+      "to": "db",
+      "y": 565,
+      "label": "事务：报工+SN明细+审核申请",
+      "variant": "emphasis"
+    },
+    {
+      "id": "report-ok",
+      "from": "api",
+      "to": "station",
+      "y": 600,
+      "label": "已提交 · 状态=待审核",
+      "variant": "return"
+    },
+    {
+      "id": "review-request",
+      "from": "reviewer",
+      "to": "api",
+      "y": 645,
+      "label": "POST /review 通过",
+      "variant": "emphasis"
+    },
+    {
+      "id": "review-tx",
+      "from": "api",
+      "to": "db",
+      "y": 685,
+      "label": "审核通过 + 流转下一工序",
+      "variant": "emphasis"
+    },
+    {
+      "id": "review-ok",
+      "from": "api",
+      "to": "station",
+      "y": 712,
+      "label": "下一工序待执行",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "station",
+      "from": 220,
+      "to": 724,
+      "type": "frontend"
+    },
+    {
+      "participant": "api",
+      "from": 225,
+      "to": 724,
+      "type": "backend"
+    },
+    {
+      "participant": "db",
+      "from": 260,
+      "to": 305,
+      "type": "database"
+    },
+    {
+      "participant": "db",
+      "from": 407,
+      "to": 452,
+      "type": "database"
+    },
+    {
+      "participant": "db",
+      "from": 560,
+      "to": 605,
+      "type": "database"
+    },
+    {
+      "participant": "db",
+      "from": 680,
+      "to": 722,
+      "type": "database"
+    },
+    {
+      "participant": "reviewer",
+      "from": 640,
+      "to": 648,
+      "type": "external"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "闭环",
+      "items": [
+        "扫码开工 → 绑定批次 → 报工提交",
+        "操作工 3 步完成，无纸质工票",
+        "扫码枪 = 键盘回车"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "审核机制",
+      "items": [
+        "报工后状态=待审核",
+        "车间主任/科长审核通过才流转",
+        "驳回退回修改，全程留痕"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "追溯基础",
+      "items": [
+        "批次绑定是反向追溯数据源",
+        "报工事务写入 SN 明细",
+        "审核记录并入工序履历"
+      ]
+    }
+  ]
+}

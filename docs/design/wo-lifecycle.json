@@ -1,0 +1,232 @@
+{
+  "schema_version": 1,
+  "diagram_type": "lifecycle",
+  "meta": {
+    "title": "工单状态机（含审核环节）",
+    "output": "工单状态机.html",
+    "quality_profile": "showcase",
+    "viewBox": [
+      980,
+      660
+    ],
+    "views": [
+      {
+        "id": "main-lifecycle",
+        "label": "主生命周期",
+        "focus": [
+          "draft",
+          "scheduled",
+          "producing",
+          "reviewing",
+          "completed"
+        ],
+        "note": "工单从创建到完工，末道工序需审核通过。"
+      },
+      {
+        "id": "exceptions",
+        "label": "异常与协商",
+        "focus": [
+          "producing",
+          "reviewing",
+          "negotiating",
+          "voided"
+        ],
+        "note": "驳回退回修改、交期风险协商、作废终态。"
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "main",
+      "label": "主流程"
+    },
+    {
+      "id": "exceptions",
+      "label": "异常处理"
+    }
+  ],
+  "states": [
+    {
+      "id": "draft",
+      "type": "start",
+      "label": "草稿",
+      "sublabel": "项目启动·建档",
+      "lane": "main",
+      "col": 0,
+      "step": "01",
+      "tag": "入口"
+    },
+    {
+      "id": "scheduled",
+      "type": "active",
+      "label": "已排产",
+      "sublabel": "模拟→确认发布·派工",
+      "lane": "main",
+      "col": 1,
+      "step": "02",
+      "tag": "计划"
+    },
+    {
+      "id": "producing",
+      "type": "active",
+      "label": "生产中",
+      "sublabel": "工序流转·报工",
+      "lane": "main",
+      "col": 2,
+      "step": "03",
+      "tag": "执行"
+    },
+    {
+      "id": "reviewing",
+      "type": "decision",
+      "label": "审核中",
+      "sublabel": "车间主任/科长确认",
+      "lane": "main",
+      "col": 3,
+      "step": "04",
+      "tag": "审核"
+    },
+    {
+      "id": "completed",
+      "type": "success",
+      "label": "完工",
+      "sublabel": "审核通过·待发货",
+      "lane": "main",
+      "col": 4,
+      "step": "05",
+      "tag": "完成"
+    },
+    {
+      "id": "voided",
+      "type": "failure",
+      "label": "作废",
+      "sublabel": "管理员作废",
+      "lane": "exceptions",
+      "col": 0,
+      "tag": "终态"
+    },
+    {
+      "id": "negotiating",
+      "type": "waiting",
+      "label": "协商中",
+      "sublabel": "交期与客户沟通",
+      "lane": "exceptions",
+      "col": 1,
+      "tag": "暂停"
+    }
+  ],
+  "transitions": [
+    {
+      "id": "draft-scheduled",
+      "from": "draft",
+      "to": "scheduled",
+      "label": "确认发布排期",
+      "variant": "emphasis",
+      "labelDy": 55
+    },
+    {
+      "id": "scheduled-producing",
+      "from": "scheduled",
+      "to": "producing",
+      "label": "首工序开工",
+      "labelDy": 55
+    },
+    {
+      "id": "producing-reviewing",
+      "from": "producing",
+      "to": "reviewing",
+      "label": "末道报工·提交审核",
+      "variant": "emphasis",
+      "labelDy": 55
+    },
+    {
+      "id": "reviewing-completed",
+      "from": "reviewing",
+      "to": "completed",
+      "label": "审核通过",
+      "variant": "emphasis",
+      "labelDy": 55
+    },
+    {
+      "id": "reviewing-producing",
+      "from": "reviewing",
+      "to": "producing",
+      "label": "驳回·修改",
+      "variant": "security",
+      "fromSide": "top",
+      "toSide": "top",
+      "via": [
+        [
+          556,
+          110
+        ],
+        [
+          402,
+          110
+        ]
+      ]
+    },
+    {
+      "id": "producing-voided",
+      "from": "producing",
+      "to": "voided",
+      "label": "作废",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "route": "straight",
+      "labelAt": [
+        402,
+        240
+      ]
+    },
+    {
+      "id": "scheduled-negotiating",
+      "from": "scheduled",
+      "to": "negotiating",
+      "label": "交期风险",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [
+        [
+          248,
+          380
+        ],
+        [
+          556,
+          380
+        ]
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "主流程",
+      "items": [
+        "草稿→已排产→生产中→审核中→完工",
+        "末道工序报工后进入审核中",
+        "审核通过才完工，每步留痕"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "审核与协商",
+      "items": [
+        "审核驳回退回修改后重新提交",
+        "交期风险进入协商中，不结束工单",
+        "与排产模拟/预警联动"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "作废终态",
+      "items": [
+        "生产阶段可被管理员作废",
+        "作废记录不可逆、留痕",
+        "不参与正常流转"
+      ]
+    }
+  ]
+}

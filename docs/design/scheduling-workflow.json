@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "排产流程：模拟排期 → 演示 → 确认发布",
+    "output": "排产算法流程.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "main-flow",
+        "label": "排产主流程",
+        "focus": [
+          "create",
+          "simulate",
+          "demo",
+          "confirm",
+          "dispatch",
+          "tasks"
+        ],
+        "note": "模拟排期草稿，演示确认后转为正式排期并派工。"
+      },
+      {
+        "id": "adjust",
+        "label": "调整循环",
+        "focus": [
+          "simulate",
+          "demo"
+        ],
+        "note": "演示不满意可返回调整参数重新模拟。"
+      }
+    ]
+  },
+  "lanes": [
+    {
+      "id": "planner",
+      "label": "计划 / 项目科"
+    },
+    {
+      "id": "sched",
+      "label": "排产服务"
+    },
+    {
+      "id": "data",
+      "label": "工位负载"
+    }
+  ],
+  "mainPath": [
+    "create",
+    "simulate",
+    "demo",
+    "confirm",
+    "dispatch",
+    "tasks"
+  ],
+  "nodes": [
+    {
+      "id": "create",
+      "lane": "planner",
+      "col": 0,
+      "type": "frontend",
+      "label": "创建工单",
+      "sublabel": "含承诺交期"
+    },
+    {
+      "id": "simulate",
+      "lane": "sched",
+      "col": 1,
+      "type": "backend",
+      "label": "模拟排期",
+      "sublabel": "草稿 · 倒排+预警"
+    },
+    {
+      "id": "demo",
+      "lane": "planner",
+      "col": 3,
+      "type": "frontend",
+      "label": "线上演示",
+      "sublabel": "会议确认排期方案"
+    },
+    {
+      "id": "confirm",
+      "lane": "sched",
+      "col": 3,
+      "type": "backend",
+      "label": "确认发布",
+      "sublabel": "转为正式排期"
+    },
+    {
+      "id": "dispatch",
+      "lane": "sched",
+      "col": 5,
+      "type": "backend",
+      "label": "正式派工",
+      "sublabel": "生成工位任务"
+    },
+    {
+      "id": "tasks",
+      "lane": "data",
+      "col": 5,
+      "type": "messagebus",
+      "label": "工位任务",
+      "sublabel": "待执行清单"
+    }
+  ],
+  "edges": [
+    {
+      "id": "create-simulate",
+      "from": "create",
+      "to": "simulate",
+      "label": "提交模拟",
+      "variant": "emphasis"
+    },
+    {
+      "id": "simulate-demo",
+      "from": "simulate",
+      "to": "demo",
+      "label": "演示方案"
+    },
+    {
+      "id": "demo-confirm",
+      "from": "demo",
+      "to": "confirm",
+      "label": "确认发布",
+      "variant": "emphasis"
+    },
+    {
+      "id": "confirm-dispatch",
+      "from": "confirm",
+      "to": "dispatch",
+      "label": "派工",
+      "variant": "emphasis"
+    },
+    {
+      "id": "dispatch-tasks",
+      "from": "dispatch",
+      "to": "tasks",
+      "label": "生成任务"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "emerald",
+      "title": "模拟排期主流程",
+      "items": [
+        "创建工单 → 模拟排期（草稿）→ 线上演示 → 确认发布 → 派工",
+        "模拟排期不占用正式产能、不派工",
+        "演示满意才确认，符合项目启动会机制"
+      ]
+    },
+    {
+      "dot": "amber",
+      "title": "调整循环",
+      "items": [
+        "演示不满意可返回调整参数重新模拟",
+        "正式排期含交期倒排 + 逾期预警 + 手动调整",
+        "机器建议、人来拍板"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "项目科特例",
+      "items": [
+        "项目经线下启动会定产品计划",
+        "排期模拟后在线上会议演示再发布",
+        "之后跟踪项目/工单进度"
+      ]
+    }
+  ]
+}

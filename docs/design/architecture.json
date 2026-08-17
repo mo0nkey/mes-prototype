@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "MES 演示原型系统 · 系统架构",
+    "output": "MES系统架构.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "main-path",
+        "label": "主链路",
+        "focus": [
+          "users",
+          "spa",
+          "core",
+          "db"
+        ],
+        "note": "从车间用户操作到数据落库的完整主链路。"
+      },
+      {
+        "id": "data-entry",
+        "label": "数据导入",
+        "focus": [
+          "excel",
+          "spa",
+          "mdm",
+          "db"
+        ],
+        "note": "主数据从 Excel 导入后进入数据库。"
+      },
+      {
+        "id": "security",
+        "label": "鉴权边界",
+        "focus": [
+          "auth",
+          "core"
+        ],
+        "note": "JWT 校验保护所有业务接口。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "users",
+      "type": "external",
+      "label": "车间用户",
+      "sublabel": "操作工 / 计划员 / 班组长 / 管理者",
+      "pos": [
+        40,
+        280
+      ],
+      "size": [
+        150,
+        80
+      ]
+    },
+    {
+      "id": "excel",
+      "type": "external",
+      "label": "PDM / Excel",
+      "sublabel": "主数据批量导入",
+      "pos": [
+        40,
+        430
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "spa",
+      "type": "frontend",
+      "label": "前端 SPA",
+      "sublabel": "Vue 3 · Element Plus · ECharts",
+      "pos": [
+        280,
+        280
+      ],
+      "size": [
+        160,
+        80
+      ],
+      "tag": "浏览器"
+    },
+    {
+      "id": "auth",
+      "type": "security",
+      "label": "JWT 鉴权",
+      "sublabel": "RBAC 角色权限",
+      "pos": [
+        540,
+        70
+      ],
+      "size": [
+        160,
+        60
+      ],
+      "tag": "安全"
+    },
+    {
+      "id": "core",
+      "type": "backend",
+      "label": "核心业务服务",
+      "sublabel": "工单 · 排产 · 执行 · 追溯",
+      "pos": [
+        540,
+        280
+      ],
+      "size": [
+        170,
+        72
+      ]
+    },
+    {
+      "id": "mdm",
+      "type": "backend",
+      "label": "主数据服务",
+      "sublabel": "产品 · 工艺 · BOM · SN 规则",
+      "pos": [
+        770,
+        190
+      ],
+      "size": [
+        170,
+        72
+      ]
+    },
+    {
+      "id": "board",
+      "type": "backend",
+      "label": "看板与报表服务",
+      "sublabel": "进度 · 安灯 · 交期风险 · 报表",
+      "pos": [
+        770,
+        420
+      ],
+      "size": [
+        170,
+        72
+      ]
+    },
+    {
+      "id": "db",
+      "type": "database",
+      "label": "SQLite 数据库",
+      "sublabel": "WAL 模式 · 追溯数据长期保留",
+      "pos": [
+        1000,
+        300
+      ],
+      "size": [
+        160,
+        90
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "FastAPI 后端（Python 单体）",
+      "wraps": [
+        "auth",
+        "core",
+        "mdm",
+        "board"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "本地单机演示环境",
+      "wraps": [
+        "spa",
+        "auth",
+        "core",
+        "mdm",
+        "board",
+        "db"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "users-to-spa",
+      "from": "users",
+      "to": "spa",
+      "label": "HTTP · 浏览器",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "excel-to-spa",
+      "from": "excel",
+      "to": "spa",
+      "label": "Excel 导入",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "bottom"
+    },
+    {
+      "id": "auth-to-core",
+      "from": "auth",
+      "to": "core",
+      "label": "校验 JWT",
+      "variant": "security",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "spa-to-core",
+      "from": "spa",
+      "to": "core",
+      "label": "REST · JWT",
+      "variant": "emphasis",
+      "fromSide": "right",
+      "toSide": "left",
+      "labelDx": 26
+    },
+    {
+      "id": "core-to-mdm",
+      "from": "core",
+      "to": "mdm",
+      "label": "内部调用",
+      "variant": "dashed",
+      "fromSide": "right",
+      "toSide": "left"
+    },
+    {
+      "id": "core-to-board",
+      "from": "core",
+      "to": "board",
+      "label": "内部调用",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "left",
+      "via": [
+        [
+          625,
+          400
+        ],
+        [
+          755,
+          400
+        ],
+        [
+          755,
+          456
+        ]
+      ]
+    },
+    {
+      "id": "core-to-db",
+      "from": "core",
+      "to": "db",
+      "label": "SQL (ORM)",
+      "fromSide": "right",
+      "toSide": "top",
+      "labelAt": [
+        880,
+        283
+      ]
+    },
+    {
+      "id": "mdm-to-db",
+      "from": "mdm",
+      "to": "db",
+      "label": "SQL (ORM)",
+      "fromSide": "right",
+      "toSide": "left",
+      "via": [
+        [
+          990,
+          226
+        ],
+        [
+          990,
+          345
+        ]
+      ],
+      "labelDy": -26
+    },
+    {
+      "id": "board-to-db",
+      "from": "board",
+      "to": "db",
+      "label": "SQL (ORM)",
+      "fromSide": "right",
+      "toSide": "bottom",
+      "via": [
+        [
+          1010,
+          456
+        ],
+        [
+          1010,
+          430
+        ],
+        [
+          1080,
+          430
+        ]
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "前端展示",
+      "items": [
+        "Vue 3 单页应用，Element Plus 组件库",
+        "ECharts 绘制看板图表",
+        "扫码枪 = 键盘回车模拟"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "后端服务",
+      "items": [
+        "单体架构：8 个业务模块聚合为 3 个服务",
+        "排产倒排算法 + 逾期预警 + 手动调整",
+        "JWT + RBAC 角色权限"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "数据存储",
+      "items": [
+        "SQLite WAL 模式，单文件零安装",
+        "追溯三表（SN/报工/批次绑定）永久保留",
+        "一键重置演示数据"
+      ]
+    }
+  ]
+}

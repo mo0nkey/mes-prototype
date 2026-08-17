@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MES 可交互低保真原型</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f0f0; color: #333; font-size: 14px; overflow: hidden; }
+
+  /* ===== Axure 风格原型播放器框架 ===== */
+  #player { display: flex; height: 100vh; }
+  #sidebar { width: 220px; background: #2c3e50; color: #ecf0f1; display: flex; flex-direction: column; flex-shrink: 0; }
+  #sidebar .logo { padding: 14px 16px; font-weight: 700; font-size: 15px; border-bottom: 1px solid #34495e; }
+  #sidebar .logo small { display: block; font-weight: 400; font-size: 11px; color: #7f8c8d; margin-top: 2px; }
+  #sidebar .sitemap { flex: 1; overflow-y: auto; padding: 8px 0; }
+  #sidebar .sitemap .nav-item { padding: 8px 16px; cursor: pointer; font-size: 13px; color: #bdc3c7; border-left: 3px solid transparent; transition: all .15s; display: flex; align-items: center; gap: 6px; }
+  #sidebar .sitemap .nav-item:hover { background: #34495e; color: #fff; }
+  #sidebar .sitemap .nav-item.active { background: #34495e; color: #fff; border-left-color: #3498db; }
+  #sidebar .sitemap .nav-item .icon { font-size: 14px; opacity: .7; }
+  #sidebar .sitemap .nav-group { padding: 6px 16px 3px; font-size: 11px; color: #7f8c8d; text-transform: uppercase; letter-spacing: 1px; }
+  #sidebar .footer { padding: 8px 16px; border-top: 1px solid #34495e; font-size: 11px; color: #7f8c8d; }
+  #sidebar .footer span { color: #e74c3c; }
+
+  #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #topbar { height: 40px; background: #fff; border-bottom: 1px solid #ddd; display: flex; align-items: center; padding: 0 16px; gap: 10px; flex-shrink: 0; }
+  #topbar .crumb { font-size: 13px; color: #555; }
+  #topbar .crumb b { color: #2c3e50; }
+  #topbar .spacer { flex: 1; }
+  #topbar .btn-top { border: 1px solid #ccc; border-radius: 4px; padding: 4px 12px; background: #fff; cursor: pointer; font-size: 12px; color: #555; }
+  #topbar .btn-top:hover { background: #f5f5f5; }
+  #topbar .btn-top.active { background: #3498db; color: #fff; border-color: #2980b9; }
+
+  #viewport { flex: 1; overflow-y: auto; padding: 0; background: #e8e8e8; }
+  .page { display: none; max-width: 1200px; margin: 20px auto; background: #fff; border: 1px solid #ccc; border-radius: 6px; min-height: calc(100vh - 100px); padding: 18px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  .page.active { display: block; }
+
+  /* ===== 线框组件 ===== */
+  .wf { border: 1px solid #999; background: #fff; border-radius: 4px; padding: 8px 10px; }
+  .btn { display: inline-block; border: 1px solid #777; border-radius: 4px; padding: 6px 14px; background: #f0f0f0; cursor: pointer; font-size: 13px; text-align: center; transition: all .12s; user-select: none; }
+  .btn:hover { filter: brightness(.95); }
+  .btn:active { transform: scale(.97); }
+  .btn.primary { background: #3498db; border-color: #2980b9; color: #fff; }
+  .btn.warn { background: #e67e22; border-color: #d35400; color: #fff; }
+  .btn.danger { background: #e74c3c; border-color: #c0392b; color: #fff; }
+  .btn.sm { padding: 3px 8px; font-size: 12px; }
+  .btn.disabled { opacity: .45; pointer-events: none; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+  th { background: #f4f6f8; }
+  tr.clickable { cursor: pointer; }
+  tr.clickable:hover { background: #eef5fc; }
+  tr.selected { background: #dbeaf6; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; border: 1px solid #999; }
+  .tag.green { color: #1e8449; border-color: #1e8449; background: #eafaf1; }
+  .tag.orange { color: #ca6f1e; border-color: #ca6f1e; background: #fef5e7; }
+  .tag.red { color: #c0392b; border-color: #c0392b; background: #fdedec; }
+  .tag.gray { color: #666; border-color: #999; background: #f2f2f2; }
+  .h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .sub { color: #888; font-size: 12px; margin-bottom: 14px; }
+  .panel { border: 1px solid #bbb; border-radius: 4px; padding: 12px; margin-bottom: 14px; background: #fafafa; }
+  .panel h3 { font-size: 14px; margin-bottom: 10px; color: #555; border-left: 4px solid #3498db; padding-left: 8px; }
+  .row { display: flex; gap: 14px; }
+  .col { flex: 1; }
+  .steps { display: flex; gap: 10px; margin: 10px 0; }
+  .step { flex: 1; border: 1px dashed #888; border-radius: 4px; padding: 10px; text-align: center; background: #fdfefe; transition: all .2s; }
+  .step.done { border-style: solid; border-color: #27ae60; background: #eafaf1; }
+  .step.active-step { border-color: #3498db; border-style: solid; background: #ebf5fb; box-shadow: 0 0 0 2px rgba(52,152,219,.15); }
+  .step .num { display: block; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #3498db; color: #fff; margin: 0 auto 6px; font-size: 12px; }
+  .step.done .num { background: #27ae60; }
+  .step .check { color: #27ae60; font-size: 14px; }
+  .input { border: 1px solid #999; border-radius: 3px; padding: 6px 8px; background: #fff; font-size: 13px; }
+  input.input { width: 260px; }
+  input.input:focus { outline: none; border-color: #3498db; box-shadow: 0 0 0 2px rgba(52,152,219,.15); }
+  .muted { color: #999; font-size: 12px; }
+  .center { text-align: center; }
+  .bignum { font-size: 30px; font-weight: 700; }
+  .board-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .board-card { border: 1px solid #999; border-radius: 4px; padding: 12px; background: #fdfefe; cursor: pointer; transition: all .15s; }
+  .board-card:hover { border-color: #3498db; box-shadow: 0 2px 8px rgba(52,152,219,.15); }
+  .board-card h4 { font-size: 13px; color: #666; margin-bottom: 6px; }
+  .bar { height: 8px; background: #ecf0f1; border-radius: 4px; margin: 6px 0; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: #27ae60; transition: width .5s; }
+  .bar i.warn { background: #e67e22; }
+  .bar i.red { background: #e74c3c; }
+  .wf-topbar { display: flex; justify-content: space-between; background: #ecf0f1; border: 1px solid #999; border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; align-items: center; }
+  .kbd { border: 1px solid #aaa; border-radius: 3px; background: #eee; padding: 1px 6px; font-size: 12px; }
+
+  /* ===== 弹窗 / Toast ===== */
+  .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.35); z-index: 999; align-items: center; justify-content: center; }
+  .overlay.show { display: flex; }
+  .modal { background: #fff; border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,.2); min-width: 420px; max-width: 560px; overflow: hidden; }
+  .modal .modal-head { padding: 14px 18px; font-weight: 700; font-size: 15px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  .modal .modal-head .close { cursor: pointer; color: #999; font-size: 18px; }
+  .modal .modal-body { padding: 18px; }
+  .modal .modal-foot { padding: 12px 18px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 8px; }
+  #toast-container { position: fixed; top: 60px; right: 24px; z-index: 1001; display: flex; flex-direction: column; gap: 8px; }
+  .toast { background: #2c3e50; color: #fff; padding: 10px 18px; border-radius: 6px; font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,.2); animation: slideIn .25s ease; max-width: 360px; }
+  .toast.success { background: #27ae60; }
+  .toast.error { background: #e74c3c; }
+  .toast.warn { background: #e67e22; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* 步骤指示器 */
+  .step-indicator { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: #888; }
+  .step-indicator .dot { width: 8px; height: 8px; border-radius: 50%; background: #3498db; }
+  .step-indicator .dot.done { background: #27ae60; }
+
+  /* 刷新倒计时 */
+  .refresh-timer { font-size: 12px; color: #888; }
+  .refresh-timer .countdown { color: #3498db; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div id="player">
+  <!-- 左侧导航 -->
+  <div id="sidebar">
+    <div class="logo">MES 原型<small>可交互低保真 · v0.2</small></div>
+    <div class="sitemap" id="sitemap">
+      <div class="nav-group">系统</div>
+      <div class="nav-item active" data-page="login"><span class="icon">&#128274;</span> 登录</div>
+      <div class="nav-group">执行层</div>
+      <div class="nav-item" data-page="shopfloor"><span class="icon">&#9881;</span> 工位执行端</div>
+      <div class="nav-item" data-page="review"><span class="icon">&#9989;</span> 审核工作台</div>
+      <div class="nav-item" data-page="board"><span class="icon">&#128202;</span> 生产看板</div>
+      <div class="nav-group">计划层</div>
+      <div class="nav-item" data-page="scheduling"><span class="icon">&#128197;</span> 排产工作台</div>
+      <div class="nav-item" data-page="wo"><span class="icon">&#128221;</span> 工单列表</div>
+      <div class="nav-item" data-page="project"><span class="icon">&#128188;</span> 项目台账</div>
+      <div class="nav-group">质量</div>
+      <div class="nav-item" data-page="trace"><span class="icon">&#128269;</span> 追溯中心</div>
+    </div>
+    <div class="footer">当前角色：<span id="currentRole">未登录</span></div>
+  </div>
+
+  <!-- 主区域 -->
+  <div id="main">
+    <div id="topbar">
+      <div class="crumb">原型 / <b id="crumbPage">登录</b></div>
+      <div class="spacer"></div>
+      <span class="refresh-timer" id="globalHint" style="color:#aaa;">点击左侧导航切换页面</span>
+      <button class="btn-top" onclick="resetPrototype()">重置原型</button>
+    </div>
+    <div id="viewport">
+
+      <!-- ============ 登录 ============ -->
+      <div class="page active" id="p-login">
+        <div class="center" style="margin-top:60px;">
+          <div class="h1" style="font-size:24px;">MES 制造执行系统</div>
+          <div class="sub">可交互原型 v0.2 · 汽车零部件模具制造</div>
+          <div style="width:360px;margin:30px auto;" class="wf">
+            <div style="margin-bottom:12px;">用户名 <input class="input" id="loginUser" style="width:200px;" placeholder="如 admin / planner" value="admin"></div>
+            <div style="margin-bottom:20px;">密　码 <input class="input" id="loginPass" style="width:200px;" type="password" placeholder="••••••" value="123456"></div>
+            <div class="center"><span class="btn primary" style="width:200px;" onclick="doLogin()">登　录</span></div>
+          </div>
+          <div class="muted">演示账号：admin（管理员）/ planner（计划科）/ director（车间主任）/ proj01（项目科）</div>
+          <div class="muted" style="margin-top:4px;">design01（设计科）/ prog01（编程科）/ wh01（仓库科）/ op01-op05（操作工）/ quality（质量科）</div>
+          <div class="muted" style="margin-top:10px; background:#fef5e7; display:inline-block; padding:6px 14px; border-radius:4px; border:1px solid #f0c36d;">交互：输入账号密码 → 登录后按角色跳转对应首页</div>
+        </div>
+      </div>
+
+      <!-- ============ 工位执行端 ============ -->
+      <div class="page" id="p-shopfloor">
+        <div class="wf-topbar"><span>工位：CNC 1# ｜ 操作工：张三</span><span class="btn sm" onclick="navigateTo('login')">退出</span></div>
+        <div class="panel">
+          <div class="h1">当前任务：MOLD-1001 前门内板拉延模</div>
+          <div class="sub">工序 2/6 CNC 粗加工 ｜ 加工组：大件组（3 件）｜ 编程号：P-1001-2 ｜ 铁板规格：12mm×2000×1000</div>
+          <div class="steps" id="shopfloorSteps">
+            <div class="step active-step" data-step="1"><span class="num">1</span><div>扫码开工</div><div class="muted" style="margin-top:6px;"><input class="input" id="snInput" style="width:150px;" placeholder="SN 或回车" onkeydown="if(event.key==='Enter')completeStep(1)"></div></div>
+            <div class="step" data-step="2"><span class="num">2</span><div>绑定铁板批次</div><div class="muted" style="margin-top:6px;"><input class="input" id="batchInput" style="width:150px;" placeholder="批次标签或回车" onkeydown="if(event.key==='Enter')completeStep(2)" disabled></div></div>
+            <div class="step" data-step="3"><span class="num">3</span><div>报工 + 提交确认</div><div class="muted" style="margin-top:6px;">数量 <input class="input" id="qtyInput" style="width:46px;" value="3" disabled> 工时 <input class="input" id="hrInput" style="width:46px;" value="2.9" disabled></div></div>
+          </div>
+          <div class="row">
+            <div class="col"><span class="btn primary" id="submitBtn" style="width:100%;" onclick="submitReport()">④ 提交确认 → 待审核</span></div>
+            <div class="col"><span class="muted">提示：扫码枪 = 键盘回车，3 步闭环</span></div>
+          </div>
+          <div id="shopfloorStatus" style="margin-top:10px;"></div>
+        </div>
+        <div class="panel">
+          <h3>安灯上报</h3>
+          <span class="btn" onclick="andon('缺料')">缺料</span>
+          <span class="btn" onclick="andon('设备')">设备</span>
+          <span class="btn" onclick="andon('质量')">质量</span>
+          <span class="btn" onclick="andon('其他')">其他</span>
+          <span class="muted" style="margin-left:12px;">备注：<input class="input" id="andonNote" style="width:220px;" placeholder="选填"></span>
+        </div>
+        <div class="muted">权限：仅本工位任务；数据范围=自己；提交后状态置为「待审核」</div>
+      </div>
+
+      <!-- ============ 排产工作台 ============ -->
+      <div class="page" id="p-scheduling">
+        <div class="wf-topbar">
+          <span>排产工作台（计划科）</span>
+          <span>
+            <span class="btn sm primary" id="modeSim" onclick="setMode('sim')">模拟模式</span>
+            <span class="btn sm" id="modeFormal" onclick="setMode('formal')">正式模式</span>
+          </span>
+        </div>
+        <div class="panel">
+          <h3>待排工单队列</h3>
+          <table>
+            <tr><th>工单号</th><th>产品</th><th>承诺交期</th><th>风险</th><th>操作</th></tr>
+            <tr><td>WO-001</td><td>前门内板拉延模</td><td>3/31</td><td><span class="tag red">⚠️ 逾期2天</span></td><td><span class="btn sm primary" onclick="calcSchedule('WO-001')">倒排建议</span></td></tr>
+            <tr><td>WO-002</td><td>A柱加强板翻边模</td><td>4/05</td><td><span class="tag green">正常</span></td><td><span class="btn sm" onclick="calcSchedule('WO-002')">倒排建议</span></td></tr>
+          </table>
+        </div>
+        <div class="panel" id="scheduleResult" style="display:none;">
+          <h3>建议排期（交期倒排结果 · <span id="scheduleWO">WO-001</span>）</h3>
+          <table>
+            <tr><th>工序</th><th>最晚开始</th><th>最晚结束</th><th>工位</th><th>状态</th></tr>
+            <tr><td>设计</td><td>3/17</td><td>3/18</td><td>D1</td><td><span class="tag green">正常</span></td></tr>
+            <tr><td>CNC 加工组</td><td>3/19</td><td>3/21</td><td>CNC 1#</td><td><span class="tag orange">⚠️ 与 WO-003 冲突</span></td></tr>
+            <tr><td>热处理</td><td>3/22</td><td>3/23</td><td>H1</td><td><span class="tag green">正常</span></td></tr>
+            <tr><td>EDM 精加工</td><td>3/24</td><td>3/26</td><td>EDM 3#</td><td><span class="tag green">正常</span></td></tr>
+            <tr><td>钳工装配</td><td>3/27</td><td>3/28</td><td>装配 2#</td><td><span class="tag gray">待齐套(缺2项)</span></td></tr>
+            <tr><td>试模</td><td>3/29</td><td>3/31</td><td>试模台 1#</td><td><span class="tag green">正常</span></td></tr>
+          </table>
+          <div style="margin-top:10px;">
+            <span class="btn" onclick="showToast('已打开改期面板（演示）','warn')">改开始时间</span>
+            <span class="btn" onclick="showToast('已打开换工位面板（演示）','warn')">换工位</span>
+            <span class="btn primary" onclick="recalculate()">即时重算</span>
+            <span class="muted">（每次调整后重算冲突与交期，只提示不强制）</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;margin-top:4px;">
+          <span class="btn warn" onclick="publishSchedule()">确认发布 → 派工</span>
+          <span class="btn" onclick="showModal('协商延期','将与客户协商延期方案，确认后工单交期将调整。','取消','确认协商','warn')">与客户协商 / 确认延期</span>
+          <span class="muted" style="align-self:center;">模拟模式不占产能；演示不满意可返回调整重新模拟</span>
+        </div>
+      </div>
+
+      <!-- ============ 审核工作台 ============ -->
+      <div class="page" id="p-review">
+        <div class="wf-topbar"><span>审核工作台（车间主任）</span><span>待审核：<b id="pendingCount">3</b> 项</span></div>
+        <div class="panel">
+          <h3>待审核列表</h3>
+          <table id="reviewTable">
+            <tr><th>工单</th><th>工序/环节</th><th>提交人</th><th>提交时间</th><th>操作</th></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>已审核记录（可查）</h3>
+          <table id="reviewedTable">
+            <tr><th>工单</th><th>环节</th><th>审核人</th><th>结果</th><th>时间</th><th>原因</th></tr>
+            <tr><td>WO-002</td><td>设计</td><td>设计科长</td><td><span class="tag green">通过</span></td><td>3/18</td><td>—</td></tr>
+            <tr><td>WO-001</td><td>编程</td><td>编程科长</td><td><span class="tag red">驳回</span></td><td>3/19</td><td>程序路径需修正</td></tr>
+          </table>
+        </div>
+        <div class="muted">权限：车间主任审厂房全部工序；各科科长审本科室；驳回不限次数、退回上一环节成员附原因</div>
+      </div>
+
+      <!-- ============ 生产看板 ============ -->
+      <div class="page" id="p-board">
+        <div class="wf-topbar">
+          <span>生产进度看板（自动刷新 <span class="countdown" id="refreshCountdown">10</span>s）</span>
+          <span class="btn sm" onclick="toggleFullscreen()">全屏</span>
+        </div>
+        <div class="board-grid">
+          <div class="board-card" onclick="showToast('在产工单详情（演示）')"><h4>在产工单</h4><div class="bignum" id="cardWO">6</div><div class="muted">完成 2 · 逾期风险 1</div></div>
+          <div class="board-card" onclick="showToast('今日报工详情（演示）')"><h4>今日报工</h4><div class="bignum" id="cardReport">128</div><div class="muted">待审核 5</div></div>
+          <div class="board-card" onclick="showToast('齐套检查详情（演示）')"><h4>齐套检查</h4><div class="bignum" id="cardKit">2/6</div><div class="muted">缺料工单 1</div></div>
+          <div class="board-card" onclick="showToast('安灯详情（演示）')"><h4>安灯</h4><div class="bignum" style="color:#e74c3c;" id="cardAndon">2</div><div class="muted">缺料 1 · 质量 1</div></div>
+        </div>
+        <div class="panel" style="margin-top:14px;">
+          <h3>产线进度</h3>
+          <table>
+            <tr><th>产线</th><th>工单</th><th>当前工序</th><th>进度</th><th>达成率</th><th>风险</th></tr>
+            <tr><td>CNC</td><td>WO-001</td><td>3/6 热处理</td><td><div class="bar" style="width:180px;"><i style="width:75%;"></i></div></td><td>75%</td><td><span class="tag green">正常</span></td></tr>
+            <tr><td>CNC</td><td>WO-002</td><td>1/6 设计</td><td><div class="bar" style="width:180px;"><i style="width:20%;" class="warn"></i></div></td><td>20%</td><td><span class="tag orange">临期</span></td></tr>
+            <tr><td>装配</td><td>WO-001</td><td>齐套检查</td><td><div class="bar" style="width:180px;"><i style="width:50%;"></i></div></td><td>—</td><td><span class="tag gray">待齐套(缺2项)</span></td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>安灯实时</h3>
+          <table id="andonTable">
+            <tr><th>工位</th><th>类型</th><th>持续</th><th>状态</th><th>处理</th></tr>
+            <tr><td>CNC 2#</td><td><span class="tag red">🔴 缺料</span></td><td id="andon1time">14 min</td><td>待处理</td><td><span class="btn sm" onclick="handleAndon(this)">处理</span></td></tr>
+            <tr><td>装配 1#</td><td><span class="tag orange">🟡 质量</span></td><td id="andon2time">5 min</td><td>待处理</td><td><span class="btn sm" onclick="handleAndon(this)">处理</span></td></tr>
+          </table>
+        </div>
+        <div class="muted">权限：全员可见；操作工限本组；质量科只读；交期风险逾期红色高亮</div>
+      </div>
+
+      <!-- ============ 追溯中心 ============ -->
+      <div class="page" id="p-trace">
+        <div class="wf-topbar">
+          <span>追溯中心</span>
+          <span>
+            <span class="btn sm primary" id="traceFwd" onclick="setTraceMode('fwd')">正向：SN</span>
+            <span class="btn sm" id="traceRev" onclick="setTraceMode('rev')">反向：批次</span>
+          </span>
+        </div>
+        <div class="panel" id="traceSearch">
+          <h3>检索</h3>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <input class="input" id="traceInput" style="width:300px;" placeholder="输入 SN 编号，如 MOLD-2025-0001" value="MOLD-2025-0001">
+            <span class="btn primary" onclick="doTrace()">查询</span>
+          </div>
+        </div>
+        <div class="panel" id="traceResult" style="display:none;">
+          <h3 id="traceTitle">正向追溯 · SN：MOLD-2025-0001</h3>
+          <table id="traceTable">
+            <tr><th>环节</th><th>时间</th><th>执行人</th><th>工位</th><th>结果</th><th>审核</th></tr>
+            <tr><td>设计</td><td>3/17</td><td>王工</td><td>D1</td><td>完成</td><td><span class="tag green">科长通过</span></td></tr>
+            <tr><td>CNC 加工组</td><td>3/19-21</td><td>张三</td><td>CNC 1#</td><td>完成</td><td><span class="tag green">主任通过</span></td></tr>
+            <tr><td>热处理</td><td>3/22-23</td><td>（外协/炉）</td><td>H1</td><td>完成</td><td><span class="tag green">主任通过</span></td></tr>
+            <tr><td>钳工装配</td><td>3/27-28</td><td>李四</td><td>装配 2#</td><td>完成</td><td><span class="tag green">主任通过</span></td></tr>
+            <tr><td>试模</td><td>3/29-31</td><td>赵工</td><td>试模台 1#</td><td>样板 ×1</td><td><span class="tag green">主任通过</span></td></tr>
+          </table>
+        </div>
+        <div class="panel">
+          <h3>用料追溯</h3>
+          <table>
+            <tr><th>类别</th><th>物料</th><th>批次/来源</th><th>数量</th></tr>
+            <tr><td>自制件铁板</td><td>模架板 12mm</td><td>批次 B-001（供应商/炉号）</td><td>1 张</td></tr>
+            <tr><td>外购件</td><td>导柱 φ40</td><td>库存（项目申购到货）</td><td>4 件</td></tr>
+            <tr><td>外购件</td><td>导套 φ60</td><td>库存</td><td>4 件</td></tr>
+          </table>
+          <div style="margin-top:10px;"><span class="btn" onclick="exportCSV()">导出 CSV</span></div>
+        </div>
+        <div class="muted">反向追溯：输入铁板批次号 → 列出受影响模具清单（质量问题快速定位）</div>
+      </div>
+
+      <!-- ============ 工单列表 ============ -->
+      <div class="page" id="p-wo">
+        <div class="wf-topbar"><span>工单管理（计划科）</span><span class="btn sm primary" onclick="showModal('新建工单','<div style=&quot;text-align:left;&quot;><p>工单号：<input class=&quot;input&quot; style=&quot;width:200px;&quot; placeholder=&quot;WO-004&quot;></p><p style=&quot;margin-top:8px;&quot;>产品名称：<input class=&quot;input&quot; style=&quot;width:200px;&quot;></p><p style=&quot;margin-top:8px;&quot;>承诺交期：<input class=&quot;input&quot; style=&quot;width:120px;&quot; placeholder=&quot;4/15&quot;></p></div>','取消','创建','primary')">+ 新建工单</span></div>
+        <div class="panel">
+          <table id="woTable">
+            <tr><th>工单号</th><th>项目</th><th>产品</th><th>交期</th><th>当前环节</th><th>状态</th><th>风险</th></tr>
+            <tr class="clickable" onclick="selectWO('WO-001')"><td>WO-001</td><td>P-2025-01</td><td>前门内板拉延模</td><td>3/31</td><td>钳工装配（待齐套）</td><td>生产中</td><td><span class="tag green">正常</span></td></tr>
+            <tr class="clickable" onclick="selectWO('WO-002')"><td>WO-002</td><td>P-2025-02</td><td>A柱加强板翻边模</td><td>4/05</td><td>设计（审核中）</td><td>生产中</td><td><span class="tag orange">临期</span></td></tr>
+            <tr class="clickable" onclick="selectWO('WO-003')"><td>WO-003</td><td>P-2025-03</td><td>翼子板冲孔模</td><td>4/10</td><td>模拟排期</td><td>已排产</td><td><span class="tag green">正常</span></td></tr>
+          </table>
+          <div class="muted" style="margin-top:8px;">筛选：状态 / 产品 / 交期 / 产线 ｜ 交期风险列表（逾期/临期高亮）｜ 点击行查看详情</div>
+        </div>
+        <div class="panel" id="woDetail" style="display:none;">
+          <h3>工单详情（<span id="woDetailNum">WO-001</span>）· 工序时间线</h3>
+          <table>
+            <tr><th>序号</th><th>工序</th><th>计划</th><th>实际</th><th>状态</th><th>审核</th></tr>
+            <tr><td>1</td><td>设计</td><td>3/17-18</td><td>3/17-18</td><td>完成</td><td>科长✅</td></tr>
+            <tr><td>2</td><td>CNC 加工组</td><td>3/19-21</td><td>3/19-21</td><td>完成</td><td>主任✅</td></tr>
+            <tr><td>3</td><td>热处理</td><td>3/22-23</td><td>3/22-23</td><td>完成</td><td>主任✅</td></tr>
+            <tr><td>4</td><td>EDM 精加工</td><td>3/24-26</td><td>—</td><td>待执行</td><td>—</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- ============ 项目台账 ============ -->
+      <div class="page" id="p-project">
+        <div class="wf-topbar"><span>项目台账（项目科）</span><span class="btn sm primary" onclick="showModal('新建项目','<div style=&quot;text-align:left;&quot;><p>项目编号：<input class=&quot;input&quot; style=&quot;width:200px;&quot; placeholder=&quot;P-2025-04&quot;></p><p style=&quot;margin-top:8px;&quot;>项目名称：<input class=&quot;input&quot; style=&quot;width:200px;&quot;></p><p style=&quot;margin-top:8px;&quot;>客户：<input class=&quot;input&quot; style=&quot;width:200px;&quot;></p></div>','取消','创建','primary')">+ 新建项目</span></div>
+        <div class="panel">
+          <table id="projectTable">
+            <tr><th>项目编号</th><th>名称</th><th>客户</th><th>图纸引用</th><th>状态</th><th>进度</th></tr>
+            <tr class="clickable" onclick="selectProject('P-2025-01')"><td>P-2025-01</td><td>某车型门板模具开发</td><td>车架事业部</td><td>DW-2201</td><td>开发中</td><td>3/6 工序</td></tr>
+            <tr class="clickable" onclick="selectProject('P-2025-02')"><td>P-2025-02</td><td>某车型侧围模具开发</td><td>车架事业部</td><td>DW-2203</td><td>模拟排期</td><td>1/6</td></tr>
+          </table>
+          <div class="muted" style="margin-top:8px;">启动会记录（线下）：kickoff_note ｜ 排期模拟 → 线上演示 → 确认发布 ｜ 点击行查看详情</div>
+        </div>
+        <div class="panel" id="projectDetail" style="display:none;">
+          <h3>项目详情（<span id="projDetailNum">P-2025-01</span>）· 外购件申购</h3>
+          <table>
+            <tr><th>申购单</th><th>外购件</th><th>数量</th><th>需求日期</th><th>状态</th></tr>
+            <tr><td>PR-001</td><td>导柱 φ40</td><td>4</td><td>3/25</td><td><span class="tag green">已到货</span></td></tr>
+            <tr><td>PR-002</td><td>标准件组套</td><td>1</td><td>3/28</td><td><span class="tag orange">申请中</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 弹窗容器 -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <div class="modal-head"><span id="modalTitle">标题</span><span class="close" onclick="closeModal()">&times;</span></div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<!-- Toast 容器 -->
+<div id="toast-container"></div>
+
+<script>
+/* ===== 全局状态 ===== */
+var roleMap = {
+  admin: { name: '管理员', page: 'board' },
+  planner: { name: '计划科', page: 'scheduling' },
+  director: { name: '车间主任', page: 'review' },
+  proj01: { name: '项目科', page: 'project' },
+  design01: { name: '设计科', page: 'review' },
+  prog01: { name: '编程科', page: 'review' },
+  wh01: { name: '仓库科', page: 'board' },
+  op01: { name: '操作工', page: 'shopfloor' },
+  op02: { name: '操作工', page: 'shopfloor' },
+  op03: { name: '操作工', page: 'shopfloor' },
+  op04: { name: '操作工', page: 'shopfloor' },
+  op05: { name: '操作工', page: 'shopfloor' },
+  quality: { name: '质量科', page: 'trace' }
+};
+var pageNames = {
+  login: '登录', shopfloor: '工位执行端', scheduling: '排产工作台',
+  review: '审核工作台', board: '生产看板', trace: '追溯中心',
+  wo: '工单列表', project: '项目台账'
+};
+var currentRole = null;
+var shopfloorStep = 0;
+var reviewData = [
+  { wo: 'WO-001', proc: 'CNC 加工组', submitter: '张三', time: '10:32' },
+  { wo: 'WO-001', proc: '钳工装配', submitter: '李四', time: '09:15' },
+  { wo: 'WO-002', proc: '设计审核', submitter: '王工', time: '08:40' }
+];
+var reviewedData = [
+  { wo: 'WO-002', proc: '设计', reviewer: '设计科长', result: '通过', time: '3/18', reason: '—' },
+  { wo: 'WO-001', proc: '编程', reviewer: '编程科长', result: '驳回', time: '3/19', reason: '程序路径需修正' }
+];
+var boardTimer = null;
+var countdownVal = 10;
+var andonMinutes = { 1: 14, 2: 5 };
+var traceMode = 'fwd';
+
+/* ===== 页面导航 ===== */
+function navigateTo(page) {
+  document.querySelectorAll('.page').forEach(function(el) { el.classList.remove('active'); });
+  var target = document.getElementById('p-' + page);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(function(el) {
+    el.classList.toggle('active', el.dataset.page === page);
+  });
+  document.getElementById('crumbPage').textContent = pageNames[page] || page;
+  document.getElementById('viewport').scrollTop = 0;
+
+  // 页面特定初始化
+  if (page === 'board') startBoardRefresh();
+  else stopBoardRefresh();
+  if (page === 'review') renderReviewTable();
+}
+
+document.querySelectorAll('.nav-item').forEach(function(el) {
+  el.addEventListener('click', function() { navigateTo(el.dataset.page); });
+});
+
+/* ===== 登录 ===== */
+function doLogin() {
+  var user = document.getElementById('loginUser').value.trim();
+  var pass = document.getElementById('loginPass').value.trim();
+  if (!user) { showToast('请输入用户名', 'error'); return; }
+  if (!pass) { showToast('请输入密码', 'error'); return; }
+  var role = roleMap[user];
+  if (!role) { showToast('用户不存在，请使用演示账号', 'error'); return; }
+  if (pass !== '123456') { showToast('密码错误，演示密码为 123456', 'error'); return; }
+  currentRole = role.name;
+  document.getElementById('currentRole').textContent = role.name;
+  showToast('登录成功！欢迎，' + role.name + '（' + user + '）', 'success');
+  setTimeout(function() { navigateTo(role.page); }, 600);
+}
+
+/* ===== 工位执行端 ===== */
+function completeStep(step) {
+  if (step === 1) {
+    var sn = document.getElementById('snInput').value.trim();
+    if (!sn) { showToast('请输入或扫码 SN', 'error'); return; }
+    document.querySelector('.step[data-step="1"]').classList.remove('active-step');
+    document.querySelector('.step[data-step="1"]').classList.add('done');
+    document.querySelector('.step[data-step="1"] .num').innerHTML = '&#10003;';
+    document.querySelector('.step[data-step="2"]').classList.add('active-step');
+    document.getElementById('batchInput').disabled = false;
+    document.getElementById('batchInput').focus();
+    shopfloorStep = 1;
+    showToast('SN ' + sn + ' 已绑定，进入步骤 2', 'success');
+  } else if (step === 2) {
+    var batch = document.getElementById('batchInput').value.trim();
+    if (!batch) { showToast('请输入或扫码批次标签', 'error'); return; }
+    document.querySelector('.step[data-step="2"]').classList.remove('active-step');
+    document.querySelector('.step[data-step="2"]').classList.add('done');
+    document.querySelector('.step[data-step="2"] .num').innerHTML = '&#10003;';
+    document.querySelector('.step[data-step="3"]').classList.add('active-step');
+    document.getElementById('qtyInput').disabled = false;
+    document.getElementById('hrInput').disabled = false;
+    shopfloorStep = 2;
+    showToast('批次 ' + batch + ' 已绑定，进入步骤 3 报工', 'success');
+  }
+}
+
+function submitReport() {
+  if (shopfloorStep < 2) { showToast('请先完成步骤 1 和 2', 'warn'); return; }
+  var qty = document.getElementById('qtyInput').value;
+  var hr = document.getElementById('hrInput').value;
+  document.querySelector('.step[data-step="3"]').classList.remove('active-step');
+  document.querySelector('.step[data-step="3"]').classList.add('done');
+  document.querySelector('.step[data-step="3"] .num').innerHTML = '&#10003;';
+  document.getElementById('submitBtn').classList.add('disabled');
+  document.getElementById('submitBtn').textContent = '✅ 已提交 · 状态：待审核';
+  document.getElementById('shopfloorStatus').innerHTML =
+    '<div class="wf" style="background:#eafaf1;border-color:#27ae60;margin-top:8px;">' +
+    '<b>报工已提交</b> · 数量 ' + qty + ' 件 · 工时 ' + hr + 'h · 状态已置为「待审核」</div>';
+  showToast('报工提交成功！数量 ' + qty + ' 件，工时 ' + hr + 'h', 'success');
+}
+
+function andon(type) {
+  var note = document.getElementById('andonNote').value || '（无备注）';
+  showToast('安灯已上报：' + type + ' · ' + note, 'warn');
+}
+
+/* ===== 排产工作台 ===== */
+function setMode(mode) {
+  if (mode === 'sim') {
+    document.getElementById('modeSim').classList.add('primary');
+    document.getElementById('modeFormal').classList.remove('primary');
+    showToast('已切换到模拟模式（不占产能）', 'success');
+  } else {
+    document.getElementById('modeFormal').classList.add('primary');
+    document.getElementById('modeSim').classList.remove('primary');
+    showToast('已切换到正式模式（占用产能）', 'warn');
+  }
+}
+
+function calcSchedule(wo) {
+  document.getElementById('scheduleResult').style.display = 'block';
+  document.getElementById('scheduleWO').textContent = wo;
+  showToast('已为 ' + wo + ' 生成倒排建议', 'success');
+}
+
+function recalculate() {
+  var btn = event.target;
+  btn.textContent = '重算中...';
+  btn.classList.add('disabled');
+  setTimeout(function() {
+    btn.textContent = '即时重算';
+    btn.classList.remove('disabled');
+    showToast('重算完成：发现 1 项冲突（CNC 1# 与 WO-003），2 项待齐套', 'warn');
+  }, 800);
+}
+
+function publishSchedule() {
+  showModal('确认发布排产',
+    '<p>即将发布排产计划并派工到各工位：</p>' +
+    '<ul style="margin:8px 0 8px 20px;color:#555;">' +
+    '<li>WO-001 前门内板拉延模 → 6 道工序</li>' +
+    '<li>派工通知将发送至：设计科 / CNC 1# / 热处理 / EDM 3# / 装配 2# / 试模台 1#</li>' +
+    '</ul><p style="color:#e67e22;">⚠️ CNC 加工组存在排产冲突，需人工确认。</p>',
+    '取消', '确认发布', 'warn',
+    function() { closeModal(); showToast('排产已发布！派工通知已发送至 6 个工位', 'success'); }
+  );
+}
+
+/* ===== 审核工作台 ===== */
+function renderReviewTable() {
+  var tbody = document.getElementById('reviewTable');
+  // 保留表头
+  while (tbody.rows.length > 1) tbody.deleteRow(1);
+  reviewData.forEach(function(item, idx) {
+    var tr = tbody.insertRow();
+    tr.innerHTML = '<td>' + item.wo + '</td><td>' + item.proc + '</td><td>' + item.submitter +
+      '</td><td>' + item.time + '</td>' +
+      '<td><span class="btn sm primary" onclick="approveReview(' + idx + ')">通过</span> ' +
+      '<span class="btn sm danger" onclick="rejectReview(' + idx + ')">驳回</span></td>';
+  });
+  document.getElementById('pendingCount').textContent = reviewData.length;
+}
+
+function approveReview(idx) {
+  var item = reviewData[idx];
+  reviewedData.unshift({
+    wo: item.wo, proc: item.proc, reviewer: currentRole || '车间主任',
+    result: '通过', time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}),
+    reason: '—'
+  });
+  reviewData.splice(idx, 1);
+  renderReviewTable();
+  renderReviewedTable();
+  showToast(item.wo + ' ' + item.proc + ' 已通过', 'success');
+}
+
+function rejectReview(idx) {
+  var item = reviewData[idx];
+  showModal('驳回确认',
+    '<p style="margin-bottom:10px;">工单：<b>' + item.wo + '</b> · ' + item.proc + ' · 提交人：' + item.submitter + '</p>' +
+    '<p style="margin-bottom:6px;">驳回原因（必填）：</p>' +
+    '<input class="input" id="rejectReason" style="width:100%;" placeholder="如 尺寸超差，需返工">',
+    '取消', '确认驳回', 'danger',
+    function() {
+      var reason = document.getElementById('rejectReason').value.trim();
+      if (!reason) { showToast('请填写驳回原因', 'error'); return; }
+      reviewedData.unshift({
+        wo: item.wo, proc: item.proc, reviewer: currentRole || '车间主任',
+        result: '驳回', time: new Date().toLocaleTimeString('zh-CN', {hour:'2-digit',minute:'2-digit'}),
+        reason: reason
+      });
+      reviewData.splice(idx, 1);
+      renderReviewTable();
+      renderReviewedTable();
+      closeModal();
+      showToast(item.wo + ' ' + item.proc + ' 已驳回，退回提交人 ' + item.submitter, 'warn');
+    }
+  );
+}
+
+function renderReviewedTable() {
+  var tbody = document.getElementById('reviewedTable');
+  while (tbody.rows.length > 1) tbody.deleteRow(1);
+  reviewedData.forEach(function(item) {
+    var tr = tbody.insertRow();
+    var tagClass = item.result === '通过' ? 'green' : 'red';
+    tr.innerHTML = '<td>' + item.wo + '</td><td>' + item.proc + '</td><td>' + item.reviewer +
+      '</td><td><span class="tag ' + tagClass + '">' + item.result + '</span></td><td>' +
+      item.time + '</td><td>' + item.reason + '</td>';
+  });
+}
+
+/* ===== 生产看板 ===== */
+function startBoardRefresh() {
+  stopBoardRefresh();
+  countdownVal = 10;
+  document.getElementById('refreshCountdown').textContent = countdownVal;
+  boardTimer = setInterval(function() {
+    countdownVal--;
+    if (countdownVal <= 0) {
+      countdownVal = 10;
+      // 模拟数据更新
+      var report = parseInt(document.getElementById('cardReport').textContent);
+      document.getElementById('cardReport').textContent = report + Math.floor(Math.random()*3);
+      andonMinutes[1]++; andonMinutes[2]++;
+      document.getElementById('andon1time').textContent = andonMinutes[1] + ' min';
+      document.getElementById('andon2time').textContent = andonMinutes[2] + ' min';
+      showToast('看板已自动刷新', 'success');
+    }
+    document.getElementById('refreshCountdown').textContent = countdownVal;
+  }, 1000);
+}
+
+function stopBoardRefresh() {
+  if (boardTimer) { clearInterval(boardTimer); boardTimer = null; }
+}
+
+function toggleFullscreen() {
+  var sidebar = document.getElementById('sidebar');
+  var topbar = document.getElementById('topbar');
+  sidebar.style.display = sidebar.style.display === 'none' ? 'flex' : 'none';
+  topbar.style.display = topbar.style.display === 'none' ? 'flex' : 'none';
+  showToast(sidebar.style.display === 'none' ? '已进入全屏模式' : '已退出全屏模式');
+}
+
+function handleAndon(btn) {
+  var row = btn.closest('tr');
+  var station = row.cells[0].textContent;
+  var type = row.cells[1].textContent;
+  row.cells[3].textContent = '处理中';
+  row.cells[3].innerHTML = '<span class="tag orange">处理中</span>';
+  btn.classList.add('disabled');
+  btn.textContent = '已处理';
+  showToast(station + ' 安灯（' + type.trim() + '）已响应，通知相关人员', 'success');
+}
+
+/* ===== 追溯中心 ===== */
+function setTraceMode(mode) {
+  traceMode = mode;
+  if (mode === 'fwd') {
+    document.getElementById('traceFwd').classList.add('primary');
+    document.getElementById('traceRev').classList.remove('primary');
+    document.getElementById('traceInput').placeholder = '输入 SN 编号，如 MOLD-2025-0001';
+    document.getElementById('traceInput').value = 'MOLD-2025-0001';
+  } else {
+    document.getElementById('traceRev').classList.add('primary');
+    document.getElementById('traceFwd').classList.remove('primary');
+    document.getElementById('traceInput').placeholder = '输入铁板批次号，如 B-001';
+    document.getElementById('traceInput').value = 'B-001';
+  }
+}
+
+function doTrace() {
+  var val = document.getElementById('traceInput').value.trim();
+  if (!val) { showToast('请输入查询内容', 'error'); return; }
+  document.getElementById('traceResult').style.display = 'block';
+  if (traceMode === 'fwd') {
+    document.getElementById('traceTitle').textContent = '正向追溯 · SN：' + val;
+    showToast('正向追溯查询完成：SN ' + val, 'success');
+  } else {
+    document.getElementById('traceTitle').textContent = '反向追溯 · 批次：' + val + ' → 受影响模具 1 件';
+    showToast('反向追溯查询完成：批次 ' + val + ' → 1 件模具受影响', 'warn');
+  }
+}
+
+function exportCSV() {
+  showToast('追溯数据已导出为 CSV（演示）', 'success');
+}
+
+/* ===== 工单列表 ===== */
+function selectWO(wo) {
+  document.querySelectorAll('#woTable tr').forEach(function(tr) { tr.classList.remove('selected'); });
+  event.currentTarget.classList.add('selected');
+  document.getElementById('woDetail').style.display = 'block';
+  document.getElementById('woDetailNum').textContent = wo;
+  showToast('已加载工单 ' + wo + ' 详情', 'success');
+}
+
+/* ===== 项目台账 ===== */
+function selectProject(proj) {
+  document.querySelectorAll('#projectTable tr').forEach(function(tr) { tr.classList.remove('selected'); });
+  event.currentTarget.classList.add('selected');
+  document.getElementById('projectDetail').style.display = 'block';
+  document.getElementById('projDetailNum').textContent = proj;
+  showToast('已加载项目 ' + proj + ' 详情', 'success');
+}
+
+/* ===== 通用：弹窗 ===== */
+function showModal(title, bodyHtml, cancelText, confirmText, confirmClass, onConfirm) {
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = bodyHtml;
+  var foot = document.getElementById('modalFoot');
+  foot.innerHTML = '';
+  if (cancelText) {
+    var cancelBtn = document.createElement('span');
+    cancelBtn.className = 'btn';
+    cancelBtn.textContent = cancelText;
+    cancelBtn.onclick = closeModal;
+    foot.appendChild(cancelBtn);
+  }
+  if (confirmText) {
+    var confirmBtn = document.createElement('span');
+    confirmBtn.className = 'btn ' + (confirmClass || 'primary');
+    confirmBtn.textContent = confirmText;
+    confirmBtn.onclick = onConfirm || closeModal;
+    foot.appendChild(confirmBtn);
+  }
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+/* ===== 通用：Toast ===== */
+function showToast(msg, type) {
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast' + (type ? ' ' + type : '');
+  toast.textContent = msg;
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity .3s';
+    setTimeout(function() { toast.remove(); }, 300);
+  }, 2500);
+}
+
+/* ===== 重置原型 ===== */
+function resetPrototype() {
+  showModal('重置原型', '<p>确定要重置所有交互状态吗？所有操作记录将清空。</p>', '取消', '确认重置', 'danger', function() {
+    closeModal();
+    location.reload();
+  });
+}
+
+/* ===== 初始化 ===== */
+renderReviewTable();
+// 登录页回车提交
+document.getElementById('loginPass').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+document.getElementById('loginUser').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') document.getElementById('loginPass').focus();
+});
+</script>
+</body>
+</html>

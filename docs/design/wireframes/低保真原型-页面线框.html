@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MES 低保真原型 · 线框图</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #e8e8e8; color: #333; font-size: 14px; }
+  /* 顶部原型工具栏 */
+  .toolbar { position: fixed; top: 0; left: 0; right: 0; height: 44px; background: #2c3e50; color: #fff; display: flex; align-items: center; padding: 0 16px; z-index: 100; gap: 8px; }
+  .toolbar .brand { font-weight: 700; margin-right: 20px; }
+  .toolbar a { color: #cfe0f0; text-decoration: none; padding: 4px 10px; border-radius: 4px; font-size: 13px; }
+  .toolbar a:hover, .toolbar a.active { background: #3498db; color: #fff; }
+  .toolbar .hint { margin-left: auto; color: #8aa; font-size: 12px; }
+  /* 页面容器 */
+  .page { display: none; max-width: 1180px; margin: 60px auto 30px; background: #fff; border: 1px solid #bbb; border-radius: 6px; min-height: 640px; padding: 18px; }
+  .page.active { display: block; }
+  /* 线框通用组件 */
+  .wf { border: 1px solid #999; background: #fff; border-radius: 4px; padding: 8px 10px; }
+  .btn { display: inline-block; border: 1px solid #777; border-radius: 4px; padding: 6px 14px; background: #f0f0f0; cursor: pointer; font-size: 13px; text-align: center; }
+  .btn.primary { background: #3498db; border-color: #2980b9; color: #fff; }
+  .btn.warn { background: #e67e22; border-color: #d35400; color: #fff; }
+  .btn.danger { background: #e74c3c; border-color: #c0392b; color: #fff; }
+  .btn.sm { padding: 3px 8px; font-size: 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13px; }
+  th, td { border: 1px solid #999; padding: 6px 8px; text-align: left; }
+  th { background: #f4f6f8; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; border: 1px solid #999; }
+  .tag.green { color: #1e8449; border-color: #1e8449; background: #eafaf1; }
+  .tag.orange { color: #ca6f1e; border-color: #ca6f1e; background: #fef5e7; }
+  .tag.red { color: #c0392b; border-color: #c0392b; background: #fdedec; }
+  .tag.gray { color: #666; border-color: #999; background: #f2f2f2; }
+  .h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .sub { color: #888; font-size: 12px; margin-bottom: 14px; }
+  .panel { border: 1px solid #bbb; border-radius: 4px; padding: 12px; margin-bottom: 14px; background: #fafafa; }
+  .panel h3 { font-size: 14px; margin-bottom: 10px; color: #555; border-left: 4px solid #3498db; padding-left: 8px; }
+  .row { display: flex; gap: 14px; }
+  .col { flex: 1; }
+  .steps { display: flex; gap: 10px; margin: 10px 0; }
+  .step { flex: 1; border: 1px dashed #888; border-radius: 4px; padding: 10px; text-align: center; background: #fdfefe; }
+  .step .num { display: block; width: 22px; height: 22px; line-height: 22px; border-radius: 50%; background: #3498db; color: #fff; margin: 0 auto 6px; }
+  .input { border: 1px solid #999; border-radius: 3px; padding: 6px 8px; background: #fff; }
+  input.input { width: 260px; }
+  .kbd { border: 1px solid #aaa; border-radius: 3px; background: #eee; padding: 1px 6px; font-size: 12px; }
+  .side { position: absolute; right: 12px; top: 12px; font-size: 12px; color: #999; }
+  .wf-topbar { display: flex; justify-content: space-between; background: #ecf0f1; border: 1px solid #999; border-radius: 4px; padding: 8px 12px; margin-bottom: 12px; font-size: 13px; }
+  .muted { color: #999; font-size: 12px; }
+  .center { text-align: center; }
+  .bignum { font-size: 30px; font-weight: 700; }
+  /* 看板样式 */
+  .board-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .board-card { border: 1px solid #999; border-radius: 4px; padding: 12px; background: #fdfefe; }
+  .board-card h4 { font-size: 13px; color: #666; margin-bottom: 6px; }
+  .bar { height: 8px; background: #ecf0f1; border-radius: 4px; margin: 6px 0; overflow: hidden; }
+  .bar i { display: block; height: 100%; background: #27ae60; }
+  .bar i.warn { background: #e67e22; }
+  .bar i.red { background: #e74c3c; }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <span class="brand">MES 低保真原型</span>
+  <a href="#login" data-p="login">登录</a>
+  <a href="#shopfloor" data-p="shopfloor">工位执行端</a>
+  <a href="#scheduling" data-p="scheduling">排产工作台</a>
+  <a href="#review" data-p="review">审核工作台</a>
+  <a href="#board" data-p="board">生产看板</a>
+  <a href="#trace" data-p="trace">追溯中心</a>
+  <a href="#wo" data-p="wo">工单列表</a>
+  <a href="#project" data-p="project">项目台账</a>
+  <span class="hint">低保真线框 · 供 Axure 底图 / 演示 · 1280×800 截屏</span>
+</div>
+
+<!-- ============ 登录 ============ -->
+<div class="page" id="p-login">
+  <div class="center" style="margin-top:80px;">
+    <div class="h1">MES 制造执行系统</div>
+    <div class="sub">演示原型 v0.1 · 汽车零部件模具制造</div>
+    <div style="width:360px;margin:30px auto;" class="wf">
+      <div style="margin-bottom:12px;">用户名 <input class="input" style="width:200px;" placeholder="如 admin / planner"></div>
+      <div style="margin-bottom:20px;">密　码 <input class="input" style="width:200px;" type="password" placeholder="••••••"></div>
+      <div class="center"><span class="btn primary" style="width:200px;">登　录</span></div>
+    </div>
+    <div class="muted">演示账号：admin（管理员）/ planner（计划科）/ director（车间主任）/ proj01（项目科）/ design01（设计科）/ prog01（编程科）/ wh01（仓库科）/ op01-op05（操作工）/ quality（质量科）</div>
+    <div class="muted" style="margin-top:8px;">交互：登录后按角色跳转对应首页；密码错误提示</div>
+  </div>
+</div>
+
+<!-- ============ 工位执行端 ============ -->
+<div class="page" id="p-shopfloor">
+  <div class="wf-topbar"><span>工位：CNC 1# ｜ 操作工：张三</span><span class="btn sm">退出</span></div>
+  <div class="panel">
+    <div class="h1">当前任务：MOLD-1001 前门内板拉延模</div>
+    <div class="sub">工序 2/6 CNC 粗加工 ｜ 加工组：大件组（3 件）｜ 编程号：P-1001-2 ｜ 铁板规格：12mm×2000×1000</div>
+    <div class="steps">
+      <div class="step"><span class="num">1</span><div>扫码开工</div><div class="muted" style="margin-top:6px;"><input class="input" style="width:150px;" placeholder="SN 或回车"></div></div>
+      <div class="step"><span class="num">2</span><div>绑定铁板批次</div><div class="muted" style="margin-top:6px;"><input class="input" style="width:150px;" placeholder="批次标签或回车"></div></div>
+      <div class="step"><span class="num">3</span><div>报工 + 提交确认</div><div class="muted" style="margin-top:6px;">数量 <input class="input" style="width:46px;" value="3"> 工时 <input class="input" style="width:46px;" value="2.9"></div></div>
+    </div>
+    <div class="row">
+      <div class="col"><span class="btn primary" style="width:100%;">④ 提交确认 → 待审核</span></div>
+      <div class="col"><span class="muted">提示：扫码枪 = 键盘回车，3 步闭环</span></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>安灯上报</h3>
+    <span class="btn">缺料</span> <span class="btn">设备</span> <span class="btn">质量</span> <span class="btn">其他</span>
+    <span class="muted" style="margin-left:12px;">备注：____________________</span>
+  </div>
+  <div class="muted">权限：仅本工位任务；数据范围=自己；提交后状态置为「待审核」</div>
+</div>
+
+<!-- ============ 排产工作台 ============ -->
+<div class="page" id="p-scheduling">
+  <div class="wf-topbar"><span>排产工作台（计划科）</span><span><span class="btn sm primary">模拟模式</span> <span class="btn sm">正式模式</span></span></div>
+  <div class="panel">
+    <h3>待排工单队列</h3>
+    <table>
+      <tr><th>工单号</th><th>产品</th><th>承诺交期</th><th>风险</th><th>操作</th></tr>
+      <tr><td>WO-001</td><td>前门内板拉延模</td><td>3/31</td><td><span class="tag red">⚠️ 逾期2天</span></td><td><span class="btn sm primary">倒排建议</span></td></tr>
+      <tr><td>WO-002</td><td>A柱加强板翻边模</td><td>4/05</td><td><span class="tag green">正常</span></td><td><span class="btn sm">倒排建议</span></td></tr>
+    </table>
+  </div>
+  <div class="panel">
+    <h3>建议排期（交期倒排结果 · WO-001）</h3>
+    <table>
+      <tr><th>工序</th><th>最晚开始</th><th>最晚结束</th><th>工位</th><th>状态</th></tr>
+      <tr><td>设计</td><td>3/17</td><td>3/18</td><td>D1</td><td><span class="tag green">正常</span></td></tr>
+      <tr><td>CNC 加工组</td><td>3/19</td><td>3/21</td><td>CNC 1#</td><td><span class="tag orange">⚠️ 与 WO-003 冲突</span></td></tr>
+      <tr><td>热处理</td><td>3/22</td><td>3/23</td><td>H1</td><td><span class="tag green">正常</span></td></tr>
+      <tr><td>EDM 精加工</td><td>3/24</td><td>3/26</td><td>EDM 3#</td><td><span class="tag green">正常</span></td></tr>
+      <tr><td>钳工装配</td><td>3/27</td><td>3/28</td><td>装配 2#</td><td><span class="tag gray">待齐套(缺2项)</span></td></tr>
+      <tr><td>试模</td><td>3/29</td><td>3/31</td><td>试模台 1#</td><td><span class="tag green">正常</span></td></tr>
+    </table>
+    <div style="margin-top:10px;">
+      <span class="btn">改开始时间</span> <span class="btn">换工位</span> <span class="btn primary">即时重算</span>
+      <span class="muted">（每次调整后重算冲突与交期，只提示不强制）</span>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <span class="btn warn">确认发布 → 派工</span>
+    <span class="btn">与客户协商 / 确认延期</span>
+    <span class="muted" style="align-self:center;">模拟模式不占产能；演示不满意可返回调整重新模拟</span>
+  </div>
+</div>
+
+<!-- ============ 审核工作台 ============ -->
+<div class="page" id="p-review">
+  <div class="wf-topbar"><span>审核工作台（车间主任）</span><span>待审核：3 项</span></div>
+  <div class="panel">
+    <h3>待审核列表</h3>
+    <table>
+      <tr><th>工单</th><th>工序/环节</th><th>提交人</th><th>提交时间</th><th>操作</th></tr>
+      <tr><td>WO-001</td><td>CNC 加工组</td><td>张三</td><td>10:32</td><td><span class="btn sm primary">通过</span> <span class="btn sm danger">驳回</span></td></tr>
+      <tr><td>WO-001</td><td>钳工装配</td><td>李四</td><td>09:15</td><td><span class="btn sm primary">通过</span> <span class="btn sm danger">驳回</span></td></tr>
+      <tr><td>WO-002</td><td>设计审核</td><td>王工</td><td>08:40</td><td><span class="btn sm primary">通过</span> <span class="btn sm danger">驳回</span></td></tr>
+    </table>
+    <div style="margin-top:10px;" class="wf">
+      <b>驳回弹窗：</b>原因（必填）<input class="input" style="width:360px;" placeholder="如 尺寸超差，需返工"> 
+      <span class="btn danger">确认驳回 → 退回提交人</span> <span class="btn">取消</span>
+    </div>
+  </div>
+  <div class="panel">
+    <h3>已审核记录（可查）</h3>
+    <table>
+      <tr><th>工单</th><th>环节</th><th>审核人</th><th>结果</th><th>时间</th><th>原因</th></tr>
+      <tr><td>WO-002</td><td>设计</td><td>设计科长</td><td><span class="tag green">通过</span></td><td>3/18</td><td>—</td></tr>
+      <tr><td>WO-001</td><td>编程</td><td>编程科长</td><td><span class="tag red">驳回</span></td><td>3/19</td><td>程序路径需修正</td></tr>
+    </table>
+  </div>
+  <div class="muted">权限：车间主任审厂房全部工序；各科科长审本科室；驳回不限次数、退回上一环节成员附原因</div>
+</div>
+
+<!-- ============ 生产看板 ============ -->
+<div class="page" id="p-board">
+  <div class="wf-topbar"><span>生产进度看板（自动刷新 10s）</span><span class="btn sm">全屏</span></div>
+  <div class="board-grid">
+    <div class="board-card"><h4>在产工单</h4><div class="bignum">6</div><div class="muted">完成 2 · 逾期风险 1</div></div>
+    <div class="board-card"><h4>今日报工</h4><div class="bignum">128</div><div class="muted">待审核 5</div></div>
+    <div class="board-card"><h4>齐套检查</h4><div class="bignum">2/6</div><div class="muted">缺料工单 1</div></div>
+    <div class="board-card"><h4>安灯</h4><div class="bignum" style="color:#e74c3c;">2</div><div class="muted">缺料 1 · 质量 1</div></div>
+  </div>
+  <div class="panel" style="margin-top:14px;">
+    <h3>产线进度</h3>
+    <table>
+      <tr><th>产线</th><th>工单</th><th>当前工序</th><th>进度</th><th>达成率</th><th>风险</th></tr>
+      <tr><td>CNC</td><td>WO-001</td><td>3/6 热处理</td><td><div class="bar" style="width:180px;"><i style="width:75%;"></i></div></td><td>75%</td><td><span class="tag green">正常</span></td></tr>
+      <tr><td>CNC</td><td>WO-002</td><td>1/6 设计</td><td><div class="bar" style="width:180px;"><i style="width:20%;" class="warn"></i></div></td><td>20%</td><td><span class="tag orange">临期</span></td></tr>
+      <tr><td>装配</td><td>WO-001</td><td>齐套检查</td><td><div class="bar" style="width:180px;"><i style="width:50%;"></i></div></td><td>—</td><td><span class="tag gray">待齐套(缺2项)</span></td></tr>
+    </table>
+  </div>
+  <div class="panel">
+    <h3>安灯实时</h3>
+    <table>
+      <tr><th>工位</th><th>类型</th><th>持续</th><th>状态</th><th>处理</th></tr>
+      <tr><td>CNC 2#</td><td><span class="tag red">🔴 缺料</span></td><td>14 min</td><td>待处理</td><td><span class="btn sm">处理</span></td></tr>
+      <tr><td>装配 1#</td><td><span class="tag orange">🟡 质量</span></td><td>5 min</td><td>待处理</td><td><span class="btn sm">处理</span></td></tr>
+    </table>
+  </div>
+  <div class="muted">权限：全员可见；操作工限本组；质量科只读；交期风险逾期红色高亮</div>
+</div>
+
+<!-- ============ 追溯中心 ============ -->
+<div class="page" id="p-trace">
+  <div class="wf-topbar"><span>追溯中心</span><span><span class="btn sm primary">正向：SN</span> <span class="btn sm">反向：批次</span></span></div>
+  <div class="panel">
+    <h3>正向追溯 · SN：MOLD-2025-0001</h3>
+    <table>
+      <tr><th>环节</th><th>时间</th><th>执行人</th><th>工位</th><th>结果</th><th>审核</th></tr>
+      <tr><td>设计</td><td>3/17</td><td>王工</td><td>D1</td><td>完成</td><td><span class="tag green">科长通过</span></td></tr>
+      <tr><td>CNC 加工组</td><td>3/19-21</td><td>张三</td><td>CNC 1#</td><td>完成</td><td><span class="tag green">主任通过</span></td></tr>
+      <tr><td>热处理</td><td>3/22-23</td><td>（外协/炉）</td><td>H1</td><td>完成</td><td><span class="tag green">主任通过</span></td></tr>
+      <tr><td>钳工装配</td><td>3/27-28</td><td>李四</td><td>装配 2#</td><td>完成</td><td><span class="tag green">主任通过</span></td></tr>
+      <tr><td>试模</td><td>3/29-31</td><td>赵工</td><td>试模台 1#</td><td>样板 ×1</td><td><span class="tag green">主任通过</span></td></tr>
+    </table>
+  </div>
+  <div class="panel">
+    <h3>用料追溯</h3>
+    <table>
+      <tr><th>类别</th><th>物料</th><th>批次/来源</th><th>数量</th></tr>
+      <tr><td>自制件铁板</td><td>模架板 12mm</td><td>批次 B-001（供应商/炉号）</td><td>1 张</td></tr>
+      <tr><td>外购件</td><td>导柱 φ40</td><td>库存（项目申购到货）</td><td>4 件</td></tr>
+      <tr><td>外购件</td><td>导套 φ60</td><td>库存</td><td>4 件</td></tr>
+    </table>
+    <div style="margin-top:10px;"><span class="btn">导出 CSV</span></div>
+  </div>
+  <div class="muted">反向追溯：输入铁板批次号 → 列出受影响模具清单（质量问题快速定位）</div>
+</div>
+
+<!-- ============ 工单列表 ============ -->
+<div class="page" id="p-wo">
+  <div class="wf-topbar"><span>工单管理（计划科）</span><span class="btn sm primary">+ 新建工单</span></div>
+  <div class="panel">
+    <table>
+      <tr><th>工单号</th><th>项目</th><th>产品</th><th>交期</th><th>当前环节</th><th>状态</th><th>风险</th></tr>
+      <tr><td>WO-001</td><td>P-2025-01</td><td>前门内板拉延模</td><td>3/31</td><td>钳工装配（待齐套）</td><td>生产中</td><td><span class="tag green">正常</span></td></tr>
+      <tr><td>WO-002</td><td>P-2025-02</td><td>A柱加强板翻边模</td><td>4/05</td><td>设计（审核中）</td><td>生产中</td><td><span class="tag orange">临期</span></td></tr>
+      <tr><td>WO-003</td><td>P-2025-03</td><td>翼子板冲孔模</td><td>4/10</td><td>模拟排期</td><td>已排产</td><td><span class="tag green">正常</span></td></tr>
+    </table>
+    <div class="muted" style="margin-top:8px;">筛选：状态 / 产品 / 交期 / 产线 ｜ 交期风险列表（逾期/临期高亮）</div>
+  </div>
+  <div class="panel">
+    <h3>工单详情（WO-001）· 工序时间线</h3>
+    <table>
+      <tr><th>序号</th><th>工序</th><th>计划</th><th>实际</th><th>状态</th><th>审核</th></tr>
+      <tr><td>1</td><td>设计</td><td>3/17-18</td><td>3/17-18</td><td>完成</td><td>科长✅</td></tr>
+      <tr><td>2</td><td>CNC 加工组</td><td>3/19-21</td><td>3/19-21</td><td>完成</td><td>主任✅</td></tr>
+      <tr><td>3</td><td>热处理</td><td>3/22-23</td><td>3/22-23</td><td>完成</td><td>主任✅</td></tr>
+      <tr><td>4</td><td>EDM 精加工</td><td>3/24-26</td><td>—</td><td>待执行</td><td>—</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ============ 项目台账 ============ -->
+<div class="page" id="p-project">
+  <div class="wf-topbar"><span>项目台账（项目科）</span><span class="btn sm primary">+ 新建项目</span></div>
+  <div class="panel">
+    <table>
+      <tr><th>项目编号</th><th>名称</th><th>客户</th><th>图纸引用</th><th>状态</th><th>进度</th></tr>
+      <tr><td>P-2025-01</td><td>某车型门板模具开发</td><td>车架事业部</td><td>DW-2201</td><td>开发中</td><td>3/6 工序</td></tr>
+      <tr><td>P-2025-02</td><td>某车型侧围模具开发</td><td>车架事业部</td><td>DW-2203</td><td>模拟排期</td><td>1/6</td></tr>
+    </table>
+    <div class="muted" style="margin-top:8px;">启动会记录（线下）：kickoff_note ｜ 排期模拟 → 线上演示 → 确认发布</div>
+  </div>
+  <div class="panel">
+    <h3>外购件申购（项目科发起 → 仓库科到货）</h3>
+    <table>
+      <tr><th>申购单</th><th>外购件</th><th>数量</th><th>需求日期</th><th>状态</th></tr>
+      <tr><td>PR-001</td><td>导柱 φ40</td><td>4</td><td>3/25</td><td><span class="tag green">已到货</span></td></tr>
+      <tr><td>PR-002</td><td>标准件组套</td><td>1</td><td>3/28</td><td><span class="tag orange">申请中</span></td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+  // hash 路由：切换页面
+  function route() {
+    const p = (location.hash || "#login").replace("#", "");
+    document.querySelectorAll(".page").forEach(el => el.classList.remove("active"));
+    const target = document.getElementById("p-" + p) || document.getElementById("p-login");
+    target.classList.add("active");
+    document.querySelectorAll(".toolbar a").forEach(a => a.classList.toggle("active", a.dataset.p === p));
+  }
+  window.addEventListener("hashchange", route);
+  route();
+</script>
+</body>
+</html>

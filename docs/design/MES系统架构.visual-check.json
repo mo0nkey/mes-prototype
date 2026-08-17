@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "ok": false,
+  "command": "visual-check",
+  "status": "fail",
+  "visualReview": "pending",
+  "artifact": {
+    "path": "/Users/zhangmengkai/Documents/Deepseek-Harness/docs/design/MES系统架构.html",
+    "sha256": "2fcd46e7579e9c688a1067b9004f8bf7b17f9e3f64d6011f179a58f6b227af4f",
+    "bytes": 638721
+  },
+  "state": {
+    "detail": "read",
+    "motion": "still"
+  },
+  "chrome": {
+    "status": "available",
+    "executable": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+  },
+  "containment": {
+    "status": "fail",
+    "viewports": []
+  },
+  "captures": {
+    "status": "fail",
+    "screenshots": [],
+    "contactSheet": null
+  },
+  "sidecars": {
+    "receipt": "MES系统架构.visual-check.json",
+    "contactSheet": "MES系统架构.visual-check.html"
+  },
+  "error": "Chrome exited before visual-check completed (21)"
+}

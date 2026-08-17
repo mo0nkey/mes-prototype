@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MES需求规格说明书-SRS-v0.2</title>
+<style>
+:root{--bg:#fff;--fg:#1f2328;--muted:#59636e;--border:#d1d9e0;--code-bg:#f6f8fa;--accent:#0969da;--stripe:#f6f8fa}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--fg:#e6edf3;--muted:#9198a1;--border:#30363d;--code-bg:#161b22;--accent:#4493f8;--stripe:#161b22}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans",Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;display:flex;align-items:flex-start}
+.toc{flex:0 0 264px;width:264px;position:sticky;top:0;max-height:100vh;overflow:auto;padding:24px 12px 40px;border-right:1px solid var(--border);font-size:13.5px;line-height:1.5}
+.toc a{display:block;padding:3px 10px;margin:1px 0;color:var(--muted);text-decoration:none;border-left:2px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toc a:hover{color:var(--fg);background:var(--code-bg)}
+.toc .l1{font-weight:600}.toc .l2{padding-left:22px}.toc .l3{padding-left:34px;font-size:13px}
+.markdown-body{flex:1;min-width:0;max-width:860px;margin:0 auto;padding:32px 40px 80px;word-wrap:break-word}
+.markdown-body h1,.markdown-body h2{border-bottom:1px solid var(--border);padding-bottom:.3em}
+.markdown-body h1,.markdown-body h2,.markdown-body h3,.markdown-body h4{margin-top:1.4em;margin-bottom:.6em;font-weight:600;line-height:1.25}
+.markdown-body a{color:var(--accent);text-decoration:none}.markdown-body a:hover{text-decoration:underline}
+.markdown-body code{background:var(--code-bg);padding:.2em .4em;border-radius:6px;font-size:85%;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+.markdown-body pre{background:var(--code-bg);padding:16px;border-radius:8px;overflow:auto;line-height:1.45}
+.markdown-body pre code{background:transparent;padding:0;font-size:90%}
+.markdown-body blockquote{margin:0;padding:0 1em;color:var(--muted);border-left:4px solid var(--border)}
+.markdown-body table{border-collapse:collapse;display:block;width:max-content;max-width:100%;overflow:auto;margin:1em 0}
+.markdown-body th,.markdown-body td{border:1px solid var(--border);padding:6px 13px}
+.markdown-body tr:nth-child(2n){background:var(--stripe)}
+.markdown-body img{max-width:100%}
+.markdown-body hr{border:none;border-top:1px solid var(--border);margin:1.6em 0}
+.markdown-body .task-list-item{list-style:none}
+.markdown-body .task-list-item input{margin:0 .4em .25em -1.4em}
+.markdown-body pre.mermaid{background:transparent;text-align:center;padding:8px 0}
+</style>
+<style>pre code.hljs{display:block;overflow-x:auto;padding:1em}code.hljs{padding:3px 5px}/*!
+  Theme: GitHub
+  Description: Light theme as seen on github.com
+  Author: github.com
+  Maintainer: @Hirse
+  Updated: 2021-05-15
+
+  Outdated base version: https://github.com/primer/github-syntax-light
+  Current colors taken from GitHub's CSS
+*/.hljs{color:#24292e;background:#fff}.hljs-doctag,.hljs-keyword,.hljs-meta .hljs-keyword,.hljs-template-tag,.hljs-template-variable,.hljs-type,.hljs-variable.language_{color:#d73a49}.hljs-title,.hljs-title.class_,.hljs-title.class_.inherited__,.hljs-title.function_{color:#6f42c1}.hljs-attr,.hljs-attribute,.hljs-literal,.hljs-meta,.hljs-number,.hljs-operator,.hljs-variable,.hljs-selector-attr,.hljs-selector-class,.hljs-selector-id{color:#005cc5}.hljs-regexp,.hljs-string,.hljs-meta .hljs-string{color:#032f62}.hljs-built_in,.hljs-symbol{color:#e36209}.hljs-comment,.hljs-code,.hljs-formula{color:#6a737d}.hljs-name,.hljs-quote,.hljs-selector-tag,.hljs-selector-pseudo{color:#22863a}.hljs-subst{color:#24292e}.hljs-section{color:#005cc5;font-weight:700}.hljs-bullet{color:#735c0f}.hljs-emphasis{color:#24292e;font-style:italic}.hljs-strong{color:#24292e;font-weight:700}.hljs-addition{color:#22863a;background-color:#f0fff4}.hljs-deletion{color:#b31d28;background-color:#ffeef0}</style>
+</head>
+<body>
+<nav class="toc">
+<a class="l1" href="#h-0">MES 演示原型系统 · 需求规格说明书（SRS）草案</a>
+<a class="l2" href="#h-1">1. 项目概述</a>
+<a class="l3" href="#h-2">1.1 背景与目标</a>
+<a class="l3" href="#h-3">1.2 范围边界</a>
+<a class="l2" href="#h-4">2. 业务画像（需求澄清结论）</a>
+<a class="l2" href="#h-5">3. 用户与角色（RBAC）</a>
+<a class="l2" href="#h-6">4. 功能需求（第一期 MVP）</a>
+<a class="l3" href="#h-7">4.1 主数据管理（地基）</a>
+<a class="l3" href="#h-8">4.2 工单管理</a>
+<a class="l3" href="#h-9">4.3 排产派工（核心：交期驱动智能排期 + 手动调整）★需求方新增重点</a>
+<a class="l3" href="#h-10">4.4 工序执行（核心闭环）</a>
+<a class="l3" href="#h-11">4.5 追溯查询（验收核心）</a>
+<a class="l3" href="#h-12">4.6 看板（演示亮点）</a>
+<a class="l3" href="#h-13">4.7 报表</a>
+<a class="l2" href="#h-14">5. 演示场景（验收用例）</a>
+<a class="l2" href="#h-15">6. 非功能需求</a>
+<a class="l2" href="#h-16">7. 技术栈建议（倾向已定，设计阶段最终确认）</a>
+<a class="l2" href="#h-17">8. 里程碑（3 个月以内）</a>
+<a class="l2" href="#h-18">9. 变更记录</a>
+<a class="l2" href="#h-19">10. 待确认事项（Open Questions）</a>
+</nav>
+<article class="markdown-body">
+<h1 id="h-0">MES 演示原型系统 · 需求规格说明书（SRS）草案</h1>
+<blockquote>
+<p>版本：v0.2（纳入需求方补充需求：交期驱动排产 + 模具行业演示数据）
+定位：<strong>学习/演练用途的可运行演示原型</strong>，不落地生产，但业务流程与数据模型按真实 MES 标准设计
+编制依据：与需求方（工厂从业者）多轮澄清访谈</p>
+</blockquote>
+<hr>
+<h2 id="h-1">1. 项目概述</h2>
+<h3 id="h-2">1.1 背景与目标</h3>
+<ul>
+<li>需求方为工厂从业人员（汽车零部件模具行业背景），希望通过对 MES 的完整搭建过程，加深对制造执行系统的理解；</li>
+<li>目标产物：<strong>一套能在单台电脑上运行、用浏览器操作演示的 MES 原型</strong>，覆盖"从工单到追溯"的核心生产执行闭环；</li>
+<li>成功标准（需求方指定）：<strong>取消纸质流转卡/工票，全部线上流转</strong>（在演示系统中体现为：工单、工序、SN 全流程线上可查、可追溯）；</li>
+<li><strong>补充目标（需求方新增）</strong>：解决"承诺交期已定但产能跟不上"的排产矛盾——系统要能<strong>智能排期并给出手动调整空间</strong>。</li>
+</ul>
+<h3 id="h-3">1.2 范围边界</h3>
+<ul>
+<li>范围：单车间（演示数据按 30+ 工位的模具车间规模构造）；</li>
+<li>第一期<strong>明确不做</strong>：质量检验流程、设备管理/数采、WMS/库存管理、自动排产引擎（APS 全自动）、考勤、人员技能管理、移动端 APP、与外部系统实时对接。</li>
+</ul>
+<hr>
+<h2 id="h-4">2. 业务画像（需求澄清结论）</h2>
+<table>
+<thead>
+<tr>
+<th class="has-resizer">维度</th>
+<th class="has-resizer">结论</th>
+<th class="has-resizer">设计影响</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>行业/类型</td>
+<td>离散制造，<strong>汽车零部件模具制造</strong></td>
+<td>单件生产、交期敏感、工序链长</td>
+</tr>
+<tr>
+<td>生产模式</td>
+<td><strong>按单生产为主</strong>（MTO/ETO 性质），少量备货</td>
+<td>每套模具=独立工单=独立 SN</td>
+</tr>
+<tr>
+<td>追溯粒度</td>
+<td><strong>单件 SN</strong>（模具编号即 SN，客户/外部规定规则）</td>
+<td>SN 规则可配置、防重复校验，正向/反向追溯</td>
+</tr>
+<tr>
+<td>排产核心诉求</td>
+<td><strong>交期锁定 + 产能跟不上 → 智能排期 + 手动调整</strong></td>
+<td>交期驱动倒排、逾期预警、冲突校验（见 4.3）</td>
+</tr>
+<tr>
+<td>物料追溯</td>
+<td>报工时扫原料批次标签</td>
+<td>原料批次 → SN 绑定关系落库</td>
+</tr>
+<tr>
+<td>主数据来源</td>
+<td>PDM/图纸系统导出 Excel 导入</td>
+<td>原型内置"Excel 导入 + 种子数据"双通道</td>
+</tr>
+<tr>
+<td>质检</td>
+<td>第一期不做</td>
+<td>追溯不含检验结果；预留字段便于二期扩展</td>
+</tr>
+<tr>
+<td>设备看板</td>
+<td>不做设备状态，只做进度+安灯</td>
+<td>安灯由人工触发/解除</td>
+</tr>
+<tr>
+<td>报工</td>
+<td>扫码枪 + 工位电脑（浏览器），<strong>支持批量报工</strong></td>
+<td>演示时可用键盘回车模拟扫码</td>
+</tr>
+<tr>
+<td>网络/部署</td>
+<td>WiFi 稳定；本地部署</td>
+<td>原型：单机本地运行，浏览器访问</td>
+</tr>
+<tr>
+<td>数据留存</td>
+<td>按客户要求（不确定）</td>
+<td>追溯核心数据长期保留，归档策略可配置</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="h-5">3. 用户与角色（RBAC）</h2>
+<table>
+<thead>
+<tr>
+<th class="has-resizer">角色</th>
+<th class="has-resizer">职责</th>
+<th class="has-resizer">主要功能入口</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>管理员</td>
+<td>主数据维护、用户/权限管理</td>
+<td>主数据、系统管理</td>
+</tr>
+<tr>
+<td>计划员</td>
+<td>创建工单、<strong>智能排产+手动调整</strong>、交期监控</td>
+<td>工单管理、排产</td>
+</tr>
+<tr>
+<td>车间操作工</td>
+<td>扫码开工、报工、原料绑定、异常上报</td>
+<td>工序执行（工位端）</td>
+</tr>
+<tr>
+<td>班组长</td>
+<td>查看产线进度、处理安灯异常</td>
+<td>看板、异常管理</td>
+</tr>
+<tr>
+<td>管理者（厂长）</td>
+<td>查看全局进度、<strong>交期风险</strong>与报表</td>
+<td>看板、报表</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="h-6">4. 功能需求（第一期 MVP）</h2>
+<h3 id="h-7">4.1 主数据管理（地基）</h3>
+<ul>
+<li><strong>产品（模具）</strong>：模具编码（=SN 规则前缀）、名称（如"某车型前门内板拉延模"）、规格、标准生产周期、默认工艺路线；</li>
+<li><strong>工艺路线（模具典型）</strong>：设计 → CNC 粗加工 → 热处理 → EDM 精加工 → 装配 → 试模；每道工序含工序编号、标准工时、可排产工位（如 CNC 1#/2#、EDM 1#、装配线）；</li>
+<li><strong>BOM</strong>：模具 → 物料清单（模架、型腔材料、标准件等，标注是否批次追溯）；</li>
+<li><strong>物料</strong>：编码、名称、规格、单位、批次管理标志；</li>
+<li><strong>SN 规则配置</strong>：按产品/客户配置（前缀 + 年月 + 流水号，如 MOLD-2025-0001），生成时防重校验；</li>
+<li><strong>数据入口</strong>：Excel 导入模板 + 内置演示种子数据（模具车间：3 条产线区、30 个工位、5-8 套代表性模具工艺、若干原料批次）。</li>
+</ul>
+<h3 id="h-8">4.2 工单管理</h3>
+<ul>
+<li>工单创建：选择模具产品、数量（通常 1 套）、<strong>承诺交期（客户已定，硬约束）</strong>、优先级、计划开始时间；</li>
+<li>工单状态机：<strong>草稿 → 已排产 → 已派工 → 生产中 → 完工 → 关闭</strong>；</li>
+<li>状态变更留痕（谁、何时、从哪到哪）；</li>
+<li>工单查询/筛选（按状态、产品、交期、产线），<strong>交期风险列表</strong>（逾期/临期高亮）。</li>
+</ul>
+<h3 id="h-9">4.3 排产派工（核心：交期驱动智能排期 + 手动调整）★需求方新增重点</h3>
+<ul>
+<li><strong>交期倒排计算</strong>：按工艺路线标准工时从承诺交期倒推，计算每道工序的"最晚开工/完工时间"，生成建议排期；</li>
+<li><strong>产能/负载校验</strong>：检查所派工位的已排负载，识别冲突（同一工位时间重叠）；</li>
+<li><strong>逾期预警</strong>：实时计算"预计完工时间 vs 承诺交期"，输出<strong>风险等级</strong>（正常/临期/逾期）与<strong>预计延期天数</strong>；产能跟不上时明确提示"按当前排期将延期 X 天"；</li>
+<li><strong>手动调整</strong>（智能建议 + 人来拍板）：
+<ul>
+<li>调整工序开始时间（前移/后移）；</li>
+<li>更换工位（如 CNC 1# 换到 CNC 2#）；</li>
+<li>系统在每次调整后<strong>即时重算</strong>冲突与交期风险，不强制但明确提示后果；</li>
+<li>交期无法满足时，计划员可标记"与客户协商中"或确认延期，留痕；</li>
+</ul>
+</li>
+<li><strong>派工产出</strong>：生成各工位的"待执行任务清单"。</li>
+</ul>
+<h3 id="h-10">4.4 工序执行（核心闭环）</h3>
+<ul>
+<li><strong>开工</strong>：操作工扫码/选择任务 → 校验 SN 规则与工单状态 → 记录开工时间；</li>
+<li><strong>原料批次绑定</strong>：报工时扫原料批次标签（如模架钢料批次），绑定到当前模具 SN；</li>
+<li><strong>报工</strong>：录入完成数量与工时；<strong>支持批量报工</strong>（N 件一次报，同时保留每件明细）；末道工序报工即完工；</li>
+<li><strong>流转</strong>：本工序完成后自动进入下一工序待执行；</li>
+<li><strong>异常上报（安灯）</strong>：工位触发异常（缺料/设备/质量/其他），可附备注；看板实时亮灯；班组长确认解除并记录处理结果；</li>
+<li><strong>交期联动</strong>：任何工序延期都会自动反映到 4.3 的逾期预警。</li>
+</ul>
+<h3 id="h-11">4.5 追溯查询（验收核心）</h3>
+<ul>
+<li><strong>正向追溯</strong>：输入模具 SN → 查询完整工序履历（每道工序时间、工位、操作工）+ 所用原料批次；</li>
+<li><strong>反向追溯</strong>：输入原料批次号 → 查询该批次被哪些模具 SN 使用；</li>
+<li>结果支持导出（Excel/CSV）。</li>
+</ul>
+<h3 id="h-12">4.6 看板（演示亮点）</h3>
+<ul>
+<li><strong>生产进度看板</strong>：按产线区/工单显示产量达成率、当前工序、状态（大屏风格）；</li>
+<li><strong>安灯看板</strong>：各工位异常灯实时状态、持续时长、处理状态；</li>
+<li><strong>交期风险看板</strong>：全部在产工单的交期状态（正常/临期/逾期），逾期红色高亮。</li>
+</ul>
+<h3 id="h-13">4.7 报表</h3>
+<ul>
+<li><strong>工单进度表</strong>：工单维度显示各工序完成情况、实际 vs 计划、<strong>交期达成情况</strong>；</li>
+<li><strong>追溯查询导出</strong>（见 4.5）。</li>
+</ul>
+<hr>
+<h2 id="h-14">5. 演示场景（验收用例）</h2>
+<ol>
+<li><strong>准备</strong>：管理员导入/生成演示数据（模具、工艺、BOM、原料批次、SN 规则）；</li>
+<li><strong>计划·正常</strong>：计划员创建 2 套模具工单（交期宽裕），系统倒排给出建议排期，派工到工位；</li>
+<li><strong>计划·紧张</strong>：创建 1 套<strong>交期紧迫</strong>的模具工单，系统提示"按当前负载将延期 X 天"——演示<strong>逾期预警</strong>；计划员手动调整（换工位/前移开始时间），系统重算后风险消除——演示<strong>智能排期+手动调整</strong>；</li>
+<li><strong>执行</strong>：操作工在工位浏览器上开工 → 扫原料批次 → 批量报工 → 下一工序，直至完工；</li>
+<li><strong>安灯</strong>：中途触发一次异常（如缺料），看板亮灯，班组长处理解除；</li>
+<li><strong>看板</strong>：切换大屏看板，展示实时进度、安灯状态、交期风险；</li>
+<li><strong>追溯</strong>：对一个已完工模具 SN 做正向追溯，对其用过的原料批次做反向追溯；</li>
+<li><strong>验证</strong>：全程无纸质流转卡，任何节点状态在系统中可查。</li>
+</ol>
+<hr>
+<h2 id="h-15">6. 非功能需求</h2>
+<table>
+<thead>
+<tr>
+<th class="has-resizer">项</th>
+<th class="has-resizer">要求</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>部署</td>
+<td>单机本地运行（Docker Compose 或直接启动），浏览器访问，局域网内其他电脑可访问演示</td>
+</tr>
+<tr>
+<td>终端</td>
+<td>电脑浏览器 + 扫码枪（键盘模拟扫码即可）</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>演示规模（30 工位并发报工），单机零压力</td>
+</tr>
+<tr>
+<td>数据</td>
+<td>追溯核心数据长期保留；演示数据库内置种子数据 + 一键重置</td>
+</tr>
+<tr>
+<td>安全</td>
+<td>角色权限控制（RBAC）、密码加密、操作日志</td>
+</tr>
+<tr>
+<td>易用性</td>
+<td>中文界面，工位端操作 3 步内完成（扫码→确认→报工）</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="h-16">7. 技术栈建议（倾向已定，设计阶段最终确认）</h2>
+<p>需求方编程基础偏业务（主要懂工厂业务），选<strong>学习曲线最平缓、代码可读性强</strong>的方案：</p>
+<table>
+<thead>
+<tr>
+<th class="has-resizer">层</th>
+<th class="has-resizer">选型</th>
+<th class="has-resizer">理由</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前端</td>
+<td>Vue 3 + Element Plus + Vite</td>
+<td>中文生态成熟，组件丰富，页面原型快</td>
+</tr>
+<tr>
+<td>后端</td>
+<td><strong>Python FastAPI</strong></td>
+<td>语法直观易读，异步性能足够，适合边学边做</td>
+</tr>
+<tr>
+<td>数据库</td>
+<td><strong>SQLite（演示零安装）→ 可平滑换 PostgreSQL</strong></td>
+<td>演示最省事，模型兼容主流库</td>
+</tr>
+<tr>
+<td>架构</td>
+<td>前后端分离 · 单体应用（不引入微服务）</td>
+<td>单体便于理解全链路</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>学习路径建议：先跑通"最小闭环"（工单→报工→追溯），再逐步加排产智能算法和看板，每一步都能在浏览器看到效果。</p>
+</blockquote>
+<hr>
+<h2 id="h-17">8. 里程碑（3 个月以内）</h2>
+<table>
+<thead>
+<tr>
+<th class="has-resizer">阶段</th>
+<th class="has-resizer">内容</th>
+<th class="has-resizer">预计</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>需求确认</td>
+<td>本 SRS 评审定稿</td>
+<td>第 1 周</td>
+</tr>
+<tr>
+<td>设计</td>
+<td>概要设计（架构/数据模型/页面原型/排产算法设计）</td>
+<td>第 2-3 周</td>
+</tr>
+<tr>
+<td>开发 M1</td>
+<td>主数据 + 工单 + 排产（含交期预警与手动调整）</td>
+<td>第 4-6 周</td>
+</tr>
+<tr>
+<td>开发 M2</td>
+<td>工序报工（含批量）+ 追溯</td>
+<td>第 7-9 周</td>
+</tr>
+<tr>
+<td>开发 M3</td>
+<td>看板（进度/安灯/交期风险）+ 报表 + 演示数据打磨</td>
+<td>第 10-11 周</td>
+</tr>
+<tr>
+<td>验收</td>
+<td>按第 5 节演示场景走通全流程</td>
+<td>第 12 周</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="h-18">9. 变更记录</h2>
+<table>
+<thead>
+<tr>
+<th class="has-resizer">版本</th>
+<th class="has-resizer">变更</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v0.1</td>
+<td>需求澄清第 1-5 轮汇总</td>
+</tr>
+<tr>
+<td>v0.2</td>
+<td>① 新增"交期驱动智能排期 + 逾期预警 + 手动调整"需求（4.3 重写）；② 演示数据改为汽车零部件模具行业；③ 报工确认支持批量；④ 技术栈倾向方案 B（Python 路线）</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="h-19">10. 待确认事项（Open Questions）</h2>
+<ol>
+<li><strong>SRS v0.2</strong>：是否认可，可进入设计阶段？</li>
+<li><strong>排产算法口径</strong>：标准工时按"每道工序定额"还是"按模具复杂度系数"估算？（设计阶段细化，演示用定额即可）</li>
+<li><strong>逾期定义</strong>：以"承诺交期"为唯一基准，还是同时参考"客户要求的最晚试模日期"？（演示按承诺交期）</li>
+</ol>
+<hr>
+<p><em>文档结束 · 待需求方审阅确认后进入设计阶段</em></p>
+
+</article>
+</body>
+</html>
